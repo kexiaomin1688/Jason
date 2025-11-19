@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 全球外卖行业洞察 | Global Food Delivery Insights</title>
+    <meta name="description" content="聚合多平台外卖资讯、行业动态及竞争分析平台。">
+    <meta name="keywords" content="外卖, 美团, 饿了么, iFood, DoorDash, 行业分析, 数据报告, 2025趋势">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0066CC', // Professional Blue
+                        secondary: '#FF9900', // Energetic Orange
+                        keeta: '#F6C90E', // Keeta/Meituan Yellow
+                        ifood: '#EA1D2C', // iFood Red
+                        rappi: '#F36E65', // Rappi Orange
+                        eleme: '#0093E9', // Eleme Blue
+                        dark: '#1A202C',
+                        light: '#F7FAFC',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans SC', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Loading Animation */
+        .spin-slow {
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Timeline Styles */
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -5px;
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #fff;
+            border: 2px solid #cbd5e0;
+            z-index: 10;
+        }
+        .timeline-item.active::before {
+            border-color: #0066CC;
+            background-color: #0066CC;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased relative">
+
+    <!-- Navigation -->
+    <header id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-transparent py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white mr-3 shadow-lg">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-gray-900" data-i18n="siteTitle">外卖洞察 2025</span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#news" class="text-gray-600 hover:text-primary font-medium transition" data-i18n="navNews">行业资讯</a>
+                    <a href="#local-intel" class="text-gray-600 hover:text-primary font-medium transition" data-i18n="navLocal">巴西情报</a>
+                    <a href="#analysis" class="text-gray-600 hover:text-primary font-medium transition" data-i18n="navAnalysis">竞争分析</a>
+                    <a href="#resources" class="text-gray-600 hover:text-primary font-medium transition" data-i18n="navResources">资源导航</a>
+                    
+                    <!-- Language Switcher -->
+                    <div class="relative group">
+                        <button class="flex items-center text-gray-600 hover:text-primary font-medium focus:outline-none">
+                            <i class="fas fa-globe mr-2"></i>
+                            <span id="currentLangLabel">中文</span>
+                            <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right z-50">
+                            <div class="py-1">
+                                <a href="#" onclick="changeLanguage('cn')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary">中文</a>
+                                <a href="#" onclick="changeLanguage('en')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary">English</a>
+                                <a href="#" onclick="changeLanguage('pt')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary">Português</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" class="text-gray-600 hover:text-primary focus:outline-none p-2">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white shadow-lg absolute w-full border-t border-gray-100">
+            <div class="px-4 pt-2 pb-4 space-y-1">
+                <a href="#news" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50" data-i18n="navNews">行业资讯</a>
+                <a href="#local-intel" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50" data-i18n="navLocal">巴西情报</a>
+                <a href="#analysis" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50" data-i18n="navAnalysis">竞争分析</a>
+                <div class="border-t border-gray-200 my-2"></div>
+                <div class="flex justify-around py-2">
+                    <button onclick="changeLanguage('cn')" class="px-3 py-1 text-sm rounded border hover:bg-gray-50">CN</button>
+                    <button onclick="changeLanguage('en')" class="px-3 py-1 text-sm rounded border hover:bg-gray-50">EN</button>
+                    <button onclick="changeLanguage('pt')" class="px-3 py-1 text-sm rounded border hover:bg-gray-50">PT</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-12 bg-gradient-to-b from-blue-50 to-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="inline-block bg-green-100 text-green-700 border border-green-200 px-3 py-1 rounded-full text-xs font-semibold mb-4 flex items-center justify-center gap-2 mx-auto w-fit">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                <span id="liveStatus">Live Data: 2025.11 (Simulated)</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight animate-fade-in-up">
+                <span class="text-primary" data-i18n="heroTitlePrefix">全球外卖</span> 
+                <span data-i18n="heroTitleSuffix">行业情报中心</span>
+            </h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8" data-i18n="heroSubtitle">
+                聚合多平台外卖资讯、深度行业动态及实时竞争分析。
+            </p>
+            <div class="flex justify-center gap-4">
+                <a href="#news" class="bg-primary text-white px-8 py-3 rounded-full font-medium shadow-lg hover:bg-blue-700 transition transform hover:scale-105" data-i18n="btnStart">
+                    浏览资讯
+                </a>
+                <a href="#subscribe" class="bg-white text-primary border border-gray-200 px-8 py-3 rounded-full font-medium shadow-sm hover:bg-gray-50 transition transform hover:scale-105" data-i18n="btnSubscribe">
+                    订阅周报
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- News & Local Intelligence Section -->
+    <section id="news" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+                <div class="text-center md:text-left mb-6 md:mb-0">
+                    <h2 class="text-3xl font-bold text-gray-900" data-i18n="newsTitle">平台动态追踪</h2>
+                    <div class="w-20 h-1 bg-secondary mt-2 rounded-full md:mx-0 mx-auto"></div>
+                </div>
+                
+                <div class="flex gap-2">
+                    <button onclick="refreshNewsData()" class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition group">
+                        <i class="fas fa-sync-alt group-hover:rotate-180 transition duration-500" id="refreshIcon"></i>
+                        <span data-i18n="btnRealTime">实时更新数据</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content Layout: News Grid + Local Intelligence Sidebar -->
+            <div class="flex flex-col lg:flex-row gap-8">
+                
+                <!-- Left Column: Global/Platform News (2/3) -->
+                <div class="lg:w-3/4 w-full">
+                    <!-- Platform Tabs -->
+                    <div class="flex flex-wrap justify-center md:justify-start gap-2 mb-6">
+                        <button onclick="filterNews('all')" id="tab-all" class="platform-tab active bg-gray-800 text-white px-4 py-1.5 rounded-full text-sm font-medium transition shadow-md">All</button>
+                        <button onclick="filterNews('Keeta')" id="tab-Keeta" class="platform-tab bg-white text-gray-600 hover:bg-gray-100 px-4 py-1.5 rounded-full text-sm font-medium transition border border-gray-200">Keeta</button>
+                        <button onclick="filterNews('iFood')" id="tab-iFood" class="platform-tab bg-white text-gray-600 hover:bg-gray-100 px-4 py-1.5 rounded-full text-sm font-medium transition border border-gray-200">iFood</button>
+                        <button onclick="filterNews('Rappi')" id="tab-Rappi" class="platform-tab bg-white text-gray-600 hover:bg-gray-100 px-4 py-1.5 rounded-full text-sm font-medium transition border border-gray-200">Rappi</button>
+                        <button onclick="filterNews('Eleme')" id="tab-Eleme" class="platform-tab bg-white text-gray-600 hover:bg-gray-100 px-4 py-1.5 rounded-full text-sm font-medium transition border border-gray-200">Ele.me</button>
+                        <button onclick="filterNews('DoorDash')" id="tab-DoorDash" class="platform-tab bg-white text-gray-600 hover:bg-gray-100 px-4 py-1.5 rounded-full text-sm font-medium transition border border-gray-200">DoorDash</button>
+                    </div>
+
+                    <!-- News Grid -->
+                    <div id="newsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Content populated by JS -->
+                    </div>
+
+                    <!-- Summary Box -->
+                    <div class="mt-8 bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl p-6 shadow-xl relative overflow-hidden">
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-white" id="summaryTitleDisplay">每日外卖简报</h3>
+                                <p class="text-gray-400 text-xs" data-i18n="summaryDesc">最新核心动态摘要</p>
+                            </div>
+                            <button onclick="copySummary()" class="mt-2 md:mt-0 bg-secondary hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-lg transition flex items-center gap-2">
+                                <i class="fas fa-copy"></i>
+                                <span data-i18n="btnCopy">复制简报</span>
+                            </button>
+                        </div>
+                        <div id="summaryPreview" class="bg-gray-800/50 rounded-lg p-3 border border-gray-700 h-48 overflow-y-auto text-gray-300 font-mono text-xs leading-relaxed">
+                            <div class="flex items-center justify-center h-full text-gray-500">
+                                <i class="fas fa-circle-notch fa-spin mr-2"></i> Loading...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Brazil Local Intelligence (1/3) -->
+                <div id="local-intel" class="lg:w-1/4 w-full">
+                    <div class="bg-white rounded-xl border border-gray-100 h-full shadow-sm flex flex-col overflow-hidden">
+                        <!-- Header -->
+                        <div class="bg-gradient-to-r from-green-600 to-green-700 p-4 text-white">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fas fa-satellite-dish animate-pulse text-green-200"></i>
+                                <h3 class="font-bold text-base" data-i18n="localIntelTitle">巴西本地情报</h3>
+                            </div>
+                            <p class="text-[10px] text-green-100 opacity-90 flex justify-between items-center">
+                                <span data-i18n="localIntelSubtitle">实时影响配送因素</span>
+                                <span class="bg-green-800/50 px-1.5 py-0.5 rounded text-[9px]">Live</span>
+                            </p>
+                        </div>
+                        
+                        <!-- Scrollable Content Area -->
+                        <div class="flex-1 overflow-y-auto p-4 bg-gray-50/50" style="max-height: 800px;">
+                            <div id="brazilNewsGrid" class="space-y-0 border-l-2 border-gray-200 ml-2 pl-4 py-1">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="p-3 bg-gray-50 border-t border-gray-100 text-center">
+                             <p class="text-[10px] text-gray-400 italic">
+                                <i class="fas fa-info-circle mr-1"></i> 
+                                <span data-i18n="localIntelNote">数据源: 气象局 / 工会 / 交通部</span>
+                             </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Analysis Section -->
+    <section id="analysis" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900" data-i18n="analysisTitle">全球竞争格局分析</h2>
+                <p class="text-gray-500 mt-2" data-i18n="analysisSubtitle">2025 巴西市场核心数据对比</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Chart Card -->
+                <div class="lg:col-span-1 bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4" data-i18n="marketShareTitle">市场份额分布 (巴西 2025)</h3>
+                    <div class="relative h-64 w-full">
+                        <canvas id="marketChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center text-xs text-gray-400">Data Source: Internal Est. 2025 Q4</div>
+                </div>
+
+                <!-- Comparison Cards -->
+                <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- iFood Analysis -->
+                    <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-red-600 card-hover">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-xl font-bold text-gray-800">iFood</h4>
+                            <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Dominant Leader</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600" data-i18n="metricCoverage">市场覆盖 (Brazil)</span>
+                                    <span class="font-bold">80%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-red-600 h-2 rounded-full" style="width: 80%"></div>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 border-t pt-2" data-i18n="ifoodAdvantage">优势：巴西本土绝对霸主，拥有最深厚的商家护城河。</p>
+                        </div>
+                    </div>
+
+                    <!-- Keeta Analysis (Meituan) -->
+                    <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-400 card-hover">
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex items-center gap-2">
+                                <h4 class="text-xl font-bold text-gray-800">Keeta</h4>
+                                <span class="text-xs text-gray-500">(Meituan)</span>
+                            </div>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Aggressive Entrant</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600" data-i18n="metricCoverage">市场覆盖 (Brazil)</span>
+                                    <span class="font-bold">3% (Growing Fast)</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-yellow-400 h-2 rounded-full" style="width: 10%"></div>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 border-t pt-2">优势：美团技术降维打击，"单人饭"极致性价比策略。</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Rappi Analysis -->
+                    <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500 card-hover">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-xl font-bold text-gray-800">Rappi</h4>
+                            <span class="bg-orange-100 text-orange-800 text-xs font-semibold px-2.5 py-0.5 rounded">Challenger</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600" data-i18n="metricCoverage">市场覆盖 (Brazil)</span>
+                                    <span class="font-bold">14%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-orange-500 h-2 rounded-full" style="width: 14%"></div>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 border-t pt-2">优势：全品类 Super App，Turbo 极速达服务。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+     <!-- Resources Section -->
+    <section id="resources" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between mb-10">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900" data-i18n="resourceTitle">行业资源导航</h2>
+                </div>
+                <a href="#" class="text-primary hover:underline text-sm" data-i18n="viewMore">查看更多</a>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="resourceGrid"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-utensils text-primary text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-white">外卖洞察 2025</span>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4 max-w-sm">
+                        专注全球外卖市场数据分析与资讯整合，为商家、投资者和研究人员提供决策支持。
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-white font-semibold mb-4">快速链接</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#news" class="hover:text-primary transition">行业资讯</a></li>
+                        <li><a href="#analysis" class="hover:text-primary transition">竞争分析</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white font-semibold mb-4">联系我们</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center"><i class="fas fa-envelope w-5 text-gray-500"></i> contact@foodinsights.com</li>
+                        <li class="flex items-center"><i class="fas fa-map-marker-alt w-5 text-gray-500"></i> São Paulo, Brazil</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-sm text-gray-500">
+                &copy; 2025 Global Food Delivery Insights. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 z-50 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3">
+        <i class="fas fa-check-circle text-green-400"></i>
+        <span id="toastMsg">Operation Successful</span>
+    </div>
+
+    <!-- Back to Top -->
+    <button id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-5 right-5 bg-primary text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center transform translate-y-20 transition-all duration-300 hover:bg-blue-600 z-40">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- State & Data ---
+        let currentLang = 'cn';
+        let myChart = null;
+        
+        const today = new Date();
+        const formatDate = (date) => date.toISOString().split('T')[0];
+        const getRelativeDate = (daysOffset) => {
+            const d = new Date(today);
+            d.setDate(today.getDate() - daysOffset);
+            return formatDate(d);
+        };
+
+        const translations = {
+            cn: {
+                siteTitle: "外卖洞察 2025",
+                navNews: "行业资讯",
+                navLocal: "巴西情报",
+                navResources: "资源导航",
+                navAnalysis: "竞争分析",
+                heroTitlePrefix: "全球外卖",
+                heroTitleSuffix: "行业情报中心",
+                heroSubtitle: "聚合多平台外卖资讯、深度行业动态及实时竞争分析。",
+                btnStart: "浏览资讯",
+                btnSubscribe: "订阅周报",
+                newsTitle: "平台动态追踪",
+                localIntelTitle: "巴西本地情报",
+                localIntelSubtitle: "实时影响配送因素",
+                localIntelNote: "数据源: 本地气象局 / 交通部 / 工会",
+                summaryTitle: `每日外卖简报`,
+                summaryDesc: "汇总 10+ 条最新核心动态，带时间戳，一键复制",
+                btnCopy: "复制全部内容",
+                resourceTitle: "行业资源导航",
+                viewMore: "查看更多",
+                analysisTitle: "全球竞争格局分析",
+                analysisSubtitle: "2025 巴西市场核心数据对比",
+                marketShareTitle: "市场份额分布 (巴西 2025)",
+                metricCoverage: "市场覆盖",
+                metricSpeed: "配送速度",
+                subTitle: "不错过 2025 行业动态",
+                subDesc: "加入超过 15,000 名行业从业者的行列，每周获取深度分析报告。",
+                btnSubscribeShort: "订阅",
+                privacyNote: "我们尊重您的隐私，绝不发送垃圾邮件。",
+                ifoodAdvantage: "优势：2025 年完成无人车试点，本地网络不可撼动。",
+                ninetynineAdvantage: "优势：依托网约车运力，2025 主打低价拼团策略。",
+                copySuccess: "已复制到剪贴板！",
+                copyFail: "复制失败，请重试。",
+                btnRealTime: "实时更新数据"
+            },
+            en: {
+                siteTitle: "Delivery Insights 2025",
+                navNews: "News",
+                navLocal: "Brazil Intel",
+                navResources: "Resources",
+                navAnalysis: "Analysis",
+                heroTitlePrefix: "Global Food",
+                heroTitleSuffix: "Delivery Intelligence",
+                heroSubtitle: "Aggregating multi-platform news, industry trends, and real-time competitive analysis.",
+                btnStart: "Explore News",
+                btnSubscribe: "Subscribe",
+                newsTitle: "Platform Tracker",
+                localIntelTitle: "Brazil Local Intel",
+                localIntelSubtitle: "Real-time Delivery Factors",
+                localIntelNote: "Source: Local Met Office / Transport Dept",
+                summaryTitle: `Daily Digest`,
+                summaryDesc: "Summary of 10+ latest dynamics with timestamps, one-click copy.",
+                btnCopy: "Copy All",
+                resourceTitle: "Industry Resources",
+                viewMore: "View More",
+                analysisTitle: "Competitive Landscape",
+                analysisSubtitle: "Core data comparison for key markets in 2025",
+                marketShareTitle: "Market Share (Brazil 2025)",
+                metricCoverage: "Coverage",
+                metricSpeed: "Speed",
+                subTitle: "Stay Updated",
+                subDesc: "Join over 15,000 industry professionals receiving our weekly reports.",
+                btnSubscribeShort: "Subscribe",
+                privacyNote: "We respect your privacy. No spam.",
+                ifoodAdvantage: "Pro: 2025 autonomous pilot complete, unshakable local network.",
+                ninetynineAdvantage: "Pro: Leverages ride-hailing fleet, 2025 low-cost group buying strategy.",
+                copySuccess: "Copied to clipboard!",
+                copyFail: "Copy failed, please try again.",
+                btnRealTime: "Update Data"
+            },
+            pt: {
+                siteTitle: "Delivery Insights 2025",
+                navNews: "Notícias",
+                navLocal: "Intel Brasil",
+                navResources: "Recursos",
+                navAnalysis: "Análise",
+                heroTitlePrefix: "Inteligência",
+                heroTitleSuffix: "Delivery Global",
+                heroSubtitle: "Agregando notícias multiplataforma, tendências e análise competitiva em tempo real.",
+                btnStart: "Explorar",
+                btnSubscribe: "Inscrever-se",
+                newsTitle: "Rastreador de Plataformas",
+                localIntelTitle: "Inteligência Local Brasil",
+                localIntelSubtitle: "Fatores de entrega em tempo real",
+                localIntelNote: "Fonte: Met Office Local / Depto Transporte",
+                summaryTitle: `Resumo Diário`,
+                summaryDesc: "Resumo das últimas dinâmicas com horário, cópia com um clique.",
+                btnCopy: "Copiar Tudo",
+                resourceTitle: "Recursos da Indústria",
+                viewMore: "Ver Mais",
+                analysisTitle: "Cenário Competitivo",
+                analysisSubtitle: "Comparação de dados para mercados-chave em 2025",
+                marketShareTitle: "Participação de Mercado (Brasil 2025)",
+                metricCoverage: "Cobertura",
+                metricSpeed: "Velocidade",
+                subTitle: "Mantenha-se Atualizado",
+                subDesc: "Junte-se a mais de 15.000 profissionais recebendo nossos relatórios.",
+                btnSubscribeShort: "Inscrever",
+                privacyNote: "Respeitamos sua privacidade. Sem spam.",
+                ifoodAdvantage: "Vantagem: Piloto autônomo completo em 2025, rede local inabalável.",
+                ninetynineAdvantage: "Vantagem: Frota de transporte, estratégia de baixo custo 2025.",
+                copySuccess: "Copiado para a área de transferência!",
+                copyFail: "Falha ao copiar.",
+                btnRealTime: "Atualizar Dados"
+            }
+        };
+
+        // Platform Color Mapping
+        const platformStyles = {
+            'Keeta': 'bg-yellow-100 text-yellow-800 border-yellow-200', // Meituan Yellow
+            'iFood': 'bg-red-100 text-red-800 border-red-200', // iFood Red
+            'Rappi': 'bg-orange-100 text-orange-800 border-orange-200', // Rappi Orange
+            'Eleme': 'bg-blue-100 text-blue-800 border-blue-200', // Eleme Blue
+            'DoorDash': 'bg-rose-100 text-rose-800 border-rose-200', // DoorDash Rose
+            'Uber Eats': 'bg-green-100 text-green-800 border-green-200', // Uber Green
+            'default': 'bg-gray-100 text-gray-800 border-gray-200'
+        };
+
+        const newsItems = [
+            { id: 1, platform: 'Keeta', time: '10:30', date: getRelativeDate(0), url: '#', source: 'Meituan IR', title_cn: 'Keeta (美团旗下) 宣布在圣保罗启动"百亿补贴"，首日单量破万', title_en: 'Keeta (Meituan) launches subsidies in Sao Paulo, 10k orders day one', title_pt: 'Keeta (Meituan) lança subsídios em SP, 10k pedidos no primeiro dia', tag: 'Expansion' },
+            { id: 2, platform: 'iFood', time: '09:45', date: getRelativeDate(0), url: '#', source: 'Bloomberg', title_cn: 'iFood 独家回应：将在 2025 Q3 上线无人机配送服务覆盖里约富人区', title_en: 'iFood Exclusive: Drone delivery to cover Rio affluent areas in Q3 2025', title_pt: 'Exclusivo iFood: Entrega por drone cobrirá áreas nobres do Rio no Q3 2025', tag: 'Innovation' },
+            { id: 3, platform: 'DoorDash', time: '09:15', date: getRelativeDate(1), url: '#', source: 'TechCrunch', title_cn: 'DoorDash 财报：拉美市场增长放缓，将重新评估巴西投资策略', title_en: 'DoorDash Earnings: LatAm growth slows, re-evaluating Brazil strategy', title_pt: 'Ganhos DoorDash: Crescimento LatAm desacelera, reavaliando Brasil', tag: 'Strategy' },
+            { id: 4, platform: 'Eleme', time: '08:50', date: getRelativeDate(1), url: '#', source: '36Kr', title_cn: '饿了么发布 "AI 猜你喜欢" 3.0，年终大促转化率提升 15%', title_en: 'Ele.me releases "AI Recommendations" 3.0, year-end conversion up 15%', title_pt: 'Ele.me lança "Recomendações IA" 3.0, conversão aumenta 15%', tag: 'Tech' },
+            { id: 5, platform: 'Rappi', time: '14:20', date: getRelativeDate(2), url: '#', source: 'LabsNews', title_cn: 'Rappi Turbo 极速送覆盖巴西 50 个新城市，挑战 iFood 霸主地位', title_en: 'Rappi Turbo expands to 50 new cities in Brazil, challenging iFood', title_pt: 'Rappi Turbo expande para 50 novas cidades no Brasil', tag: 'Competition' },
+            { id: 6, platform: 'Uber Eats', time: '11:00', date: getRelativeDate(3), url: '#', source: 'Reuters', title_cn: 'Uber Eats (Global) 宣布与特斯拉达成自动驾驶配送全球合作伙伴关系', title_en: 'Uber Eats announces global autonomous delivery partnership with Tesla', title_pt: 'Uber Eats anuncia parceria global de entrega autônoma com Tesla', tag: 'Partnership' },
+            { id: 7, platform: 'Keeta', time: '09:30', date: getRelativeDate(4), url: '#', source: 'ArabNews', title_cn: 'Keeta 中东捷报：利雅得日单量登顶，验证"极致性价比"模式', title_en: 'Keeta hits #1 daily orders in Riyadh, validating efficiency model', title_pt: 'Keeta atinge #1 em pedidos diários em Riad', tag: 'Global' },
+            { id: 8, platform: 'iFood', time: '11:20', date: getRelativeDate(5), url: '#', source: 'Exame', title_cn: 'iFood 利用 AI 预测需求，将食物浪费减少 30%', title_en: 'iFood cuts food waste by 30% using AI demand prediction', title_pt: 'iFood reduz desperdício de alimentos em 30% usando previsão de IA', tag: 'Sustainability' }
+        ];
+
+        // Expanded Brazil Local Intel Data (8 items)
+        const brazilNews = [
+            { type: 'weather', time: '14:30', icon: 'fa-cloud-bolt', color: 'text-blue-500', borderColor: 'border-blue-500', bg: 'bg-blue-50', title_cn: '圣保罗暴雨红色预警', title_en: 'SP Red Rain Alert', title_pt: 'Alerta Vermelho Chuva SP', desc_cn: '预计未来 4 小时强降雨，建议开启恶劣天气补贴。', desc_en: 'Heavy storms next 4h. Activate surge pricing.', desc_pt: 'Tempestades fortes próximas 4h.' },
+            { type: 'traffic', time: '13:15', icon: 'fa-road', color: 'text-red-500', borderColor: 'border-red-500', bg: 'bg-red-50', title_cn: '保利斯塔大道封锁', title_en: 'Paulista Ave Closed', title_pt: 'Av. Paulista Fechada', desc_cn: '大规模游行示威，Jardins 区配送请绕行。', desc_en: 'Protest ongoing. Avoid Jardins area.', desc_pt: 'Protesto em andamento. Evite Jardins.' },
+            { type: 'strike', time: '11:45', icon: 'fa-bullhorn', color: 'text-orange-500', borderColor: 'border-orange-500', bg: 'bg-orange-50', title_cn: '工会罢工风险', title_en: 'Union Strike Risk', title_pt: 'Risco Greve Sindicato', desc_cn: '圣保罗外卖工会宣布可能在周五举行罢工。', desc_en: 'SP delivery union hints at Friday strike.', desc_pt: 'Sindicato entregadores SP sinaliza greve sexta.' },
+            { type: 'event', time: '10:30', icon: 'fa-mask', color: 'text-pink-500', borderColor: 'border-pink-500', bg: 'bg-pink-50', title_cn: '狂欢节预热活动', title_en: 'Carnival Warm-up', title_pt: 'Esquenta Carnaval', desc_cn: '里约中心区订单量预计激增 40%。', desc_en: 'Rio center orders expected +40%.', desc_pt: 'Pedidos centro Rio previstos +40%.' },
+            { type: 'safety', time: '09:20', icon: 'fa-shield-alt', color: 'text-gray-700', borderColor: 'border-gray-700', bg: 'bg-gray-100', title_cn: '治安高危区域更新', title_en: 'Safety Zone Update', title_pt: 'Atualização Zona Segurança', desc_cn: '北区某些街道发生多起抢劫，骑手拒单率上升。', desc_en: 'Robberies in North Zone. High reject rate.', desc_pt: 'Assaltos na Zona Norte. Alta taxa de rejeição.' },
+            { type: 'economy', time: '08:45', icon: 'fa-gas-pump', color: 'text-purple-500', borderColor: 'border-purple-500', bg: 'bg-purple-50', title_cn: '燃油价格上涨', title_en: 'Fuel Prices Hike', title_pt: 'Alta Preço Combustível', desc_cn: '汽油价格上涨 3%，可能影响燃油车骑手出勤。', desc_en: 'Gas up 3%. May affect moto riders.', desc_pt: 'Gasolina sobe 3%. Pode afetar motoboys.' },
+             { type: 'policy', time: '08:10', icon: 'fa-file-signature', color: 'text-indigo-500', borderColor: 'border-indigo-500', bg: 'bg-indigo-50', title_cn: '新社保法案草案', title_en: 'Social Security Bill', title_pt: 'Lei Seguridade Social', desc_cn: '政府提议增加平台社保缴纳比例。', desc_en: 'Gov proposes higher platform social fees.', desc_pt: 'Gov propõe taxas sociais mais altas.' },
+            { type: 'finance', time: '07:30', icon: 'fa-chart-line', color: 'text-green-600', borderColor: 'border-green-600', bg: 'bg-green-50', title_cn: '汇率波动提醒', title_en: 'Exchange Rate Alert', title_pt: 'Alerta Taxa Câmbio', desc_cn: '雷亚尔兑美元贬值 1.2%，利好海外收入财报。', desc_en: 'BRL down 1.2% vs USD.', desc_pt: 'BRL cai 1.2% vs USD.' }
+        ];
+
+        const resources = [
+            { name: "36Kr Food", desc_cn: "36氪 - 权威科技创投媒体", desc_en: "36Kr - Tech & VC Media", desc_pt: "36Kr - Mídia de Tecnologia e VC", url: "https://36kr.com/information/web_news", icon: "fa-newspaper" },
+            { name: "Bloomberg Tech", desc_cn: "彭博社科技版 - 全球财经", desc_en: "Bloomberg Technology", desc_pt: "Bloomberg Tecnologia", url: "https://www.bloomberg.com/technology", icon: "fa-chart-line" },
+            { name: "Valor Econômico", desc_cn: "巴西最大财经报纸", desc_en: "Brazil's Top Finance Paper", desc_pt: "Valor Econômico", url: "https://valor.globo.com/", icon: "fa-file-invoice-dollar" },
+            { name: "Meituan Institute", desc_cn: "美团研究院 - 官方行业数据", desc_en: "Meituan Research Institute", desc_pt: "Instituto de Pesquisa Meituan", url: "https://www.meituan.com/", icon: "fa-book" },
+            { name: "Statista", desc_cn: "全球统计数据库", desc_en: "Global Statistics Database", desc_pt: "Banco de Dados de Estatísticas", url: "https://www.statista.com/", icon: "fa-database" },
+            { name: "ABRASEL", desc_cn: "巴西酒吧餐馆协会", desc_en: "Brazilian Bar & Restaurant Assoc.", desc_pt: "Associação Brasileira de Bares", url: "https://abrasel.com.br/", icon: "fa-utensils" }
+        ];
+
+        // --- Core Functions ---
+
+        function init() {
+            document.getElementById('liveStatus').innerText = `Live Data: ${formatDate(today)} (Simulated)`;
+            renderNews('all');
+            renderBrazilNews();
+            renderResources();
+            updateSummary();
+            initChart();
+            
+            window.addEventListener('scroll', () => {
+                const nav = document.getElementById('navbar');
+                const backBtn = document.getElementById('backToTop');
+                if (window.scrollY > 50) {
+                    nav.classList.remove('bg-transparent', 'py-4');
+                    nav.classList.add('bg-white', 'shadow-md', 'py-2');
+                    backBtn.classList.remove('translate-y-20');
+                    backBtn.classList.add('translate-y-0');
+                } else {
+                    nav.classList.add('bg-transparent', 'py-4');
+                    nav.classList.remove('bg-white', 'shadow-md', 'py-2');
+                    backBtn.classList.add('translate-y-20');
+                    backBtn.classList.remove('translate-y-0');
+                }
+            });
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('currentLangLabel').innerText = lang === 'cn' ? '中文' : (lang === 'en' ? 'EN' : 'PT');
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerText = translations[lang][key];
+                }
+            });
+
+            renderNews(document.querySelector('.platform-tab.active').innerText === 'All' ? 'all' : document.querySelector('.platform-tab.active').innerText.trim());
+            renderBrazilNews();
+            renderResources();
+            updateSummary();
+            updateChart();
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        }
+
+        function filterNews(platform) {
+            document.querySelectorAll('.platform-tab').forEach(btn => {
+                btn.classList.remove('bg-gray-800', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-600', 'border');
+            });
+            const activeBtn = document.getElementById(`tab-${platform}`);
+            if(activeBtn) {
+                activeBtn.classList.remove('bg-white', 'text-gray-600', 'border');
+                activeBtn.classList.add('bg-gray-800', 'text-white');
+            }
+            renderNews(platform);
+        }
+
+        function renderNews(filter) {
+            const grid = document.getElementById('newsGrid');
+            grid.innerHTML = '';
+
+            const filtered = filter === 'all' ? newsItems : newsItems.filter(item => item.platform === filter);
+
+            if (filtered.length === 0) {
+                 grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400">No updates for this platform yet.</div>`;
+                 return;
+            }
+
+            filtered.forEach((item, index) => {
+                const title = item[`title_${currentLang}`] || item.title_en;
+                const badgeClass = platformStyles[item.platform] || platformStyles['default'];
+                
+                const html = `
+                    <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm card-hover animate-fade-in flex flex-col h-full" style="animation-delay: ${index * 50}ms">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="${badgeClass} text-xs font-bold px-2.5 py-1 rounded border uppercase tracking-wide shadow-sm">${item.platform}</span>
+                            <div class="text-right">
+                                <span class="block text-gray-400 text-[10px] font-mono">${item.date}</span>
+                                <span class="block text-gray-300 text-[10px] font-mono">${item.time}</span>
+                            </div>
+                        </div>
+                        <h3 class="text-base font-bold text-gray-800 mb-2 leading-snug line-clamp-3">${title}</h3>
+                        <div class="mt-auto pt-3 border-t border-gray-50 flex justify-between items-center">
+                            <span class="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded">Src: ${item.source}</span>
+                            <span class="text-[10px] text-primary font-semibold"><i class="fas fa-tag mr-1"></i> ${item.tag}</span>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += html;
+            });
+        }
+
+        function renderBrazilNews() {
+            const grid = document.getElementById('brazilNewsGrid');
+            grid.innerHTML = '';
+            
+            brazilNews.forEach((item, index) => {
+                const title = item[`title_${currentLang}`] || item.title_en;
+                const desc = item[`desc_${currentLang}`] || item.desc_en;
+                
+                const html = `
+                    <div class="relative pl-4 pb-6 last:pb-0 timeline-item animate-fade-in" style="animation-delay: ${index * 100}ms">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 ${item.borderColor} z-10"></div>
+                        <div class="absolute left-[9px] top-2 bottom-0 w-0.5 bg-gray-100 -ml-[10px] -z-0"></div>
+                        
+                        <div class="mb-1 flex items-center gap-2">
+                            <span class="text-xs font-mono font-bold text-gray-500 bg-white px-1 rounded border border-gray-100">${item.time}</span>
+                        </div>
+                        
+                        <div class="${item.bg} p-3 rounded-lg border ${item.borderColor} border-opacity-30 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex items-start gap-2">
+                                <i class="fas ${item.icon} ${item.color} mt-0.5 text-sm"></i>
+                                <div>
+                                    <h4 class="text-xs font-bold text-gray-800 leading-tight mb-1">${title}</h4>
+                                    <p class="text-[10px] text-gray-600 leading-snug">${desc}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += html;
+            });
+        }
+        
+        function refreshNewsData() {
+            const btn = document.querySelector('button[onclick="refreshNewsData()"]');
+            const icon = document.getElementById('refreshIcon');
+            
+            icon.classList.add('spin-slow');
+            btn.disabled = true;
+            btn.classList.add('opacity-75');
+            
+            setTimeout(() => {
+                newsItems.sort(() => Math.random() - 0.5);
+                const activeTab = document.querySelector('.platform-tab.active').innerText.trim();
+                renderNews(activeTab === 'All' ? 'all' : activeTab);
+                // Shuffle Brazil news slightly to simulate update
+                brazilNews.sort(() => Math.random() - 0.3);
+                renderBrazilNews(); 
+                updateSummary();
+                
+                showToast(currentLang === 'cn' ? '数据已更新至最新！' : 'Data Updated Successfully!', 'success');
+                
+                icon.classList.remove('spin-slow');
+                btn.disabled = false;
+                btn.classList.remove('opacity-75');
+            }, 1200);
+        }
+
+        function updateSummary() {
+            const container = document.getElementById('summaryPreview');
+            const titleDiv = document.getElementById('summaryTitleDisplay');
+            
+            const dateString = formatDate(today);
+            const currentTitle = `${translations[currentLang].summaryTitle} (${dateString})`;
+            titleDiv.innerText = currentTitle;
+            
+            let htmlContent = `<div class="mb-2 font-bold border-b border-gray-700 pb-2 text-xs text-gray-400">${currentTitle}</div>`;
+            
+            newsItems.slice(0, 10).forEach((item) => {
+                const title = item[`title_${currentLang}`] || item.title_en;
+                htmlContent += `
+                    <div class="mb-2 hover:bg-gray-700/50 p-1 rounded transition">
+                        <span class="text-gray-500 font-mono text-[10px] mr-1">[${item.time}]</span>
+                        <span class="text-secondary font-bold text-[10px] mr-1">【${item.platform}】</span>
+                        <span class="text-gray-300 text-xs">${title}</span>
+                    </div>
+                `;
+            });
+            
+            htmlContent += `<div class="mt-4 text-[10px] text-gray-600">🔗 Source: Global Food Delivery Insights 2025</div>`;
+            container.innerHTML = htmlContent;
+        }
+
+        function copySummary() {
+            const dateString = formatDate(today);
+            const currentTitle = `${translations[currentLang].summaryTitle} (${dateString})`;
+            let text = `${currentTitle}\n------------------------------\n`;
+            
+            newsItems.slice(0, 10).forEach((item) => {
+                const title = item[`title_${currentLang}`] || item.title_en;
+                text += `${item.time} | 【${item.platform}】 ${title}\n`;
+            });
+            text += `\n🔗 Source: Global Food Delivery Insights 2025`;
+
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            textArea.style.top = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast(translations[currentLang].copySuccess, 'success');
+                } else {
+                    throw new Error('execCommand failed');
+                }
+            } catch (err) {
+                 showToast(translations[currentLang].copyFail, 'error');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function renderResources() {
+            const grid = document.getElementById('resourceGrid');
+            grid.innerHTML = '';
+            resources.forEach(res => {
+                const desc = res[`desc_${currentLang}`] || res.desc_en;
+                const html = `
+                    <a href="${res.url}" target="_blank" class="flex items-start p-4 bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition group">
+                        <div class="w-10 h-10 bg-blue-50 text-primary rounded-lg flex items-center justify-center flex-shrink-0 mr-4 group-hover:bg-primary group-hover:text-white transition">
+                            <i class="fas ${res.icon}"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800 group-hover:text-primary transition">${res.name}</h4>
+                            <p class="text-xs text-gray-500 mt-1">${desc}</p>
+                        </div>
+                    </a>
+                `;
+                grid.innerHTML += html;
+            });
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('marketChart').getContext('2d');
+            const data = {
+                labels: ['iFood (Dominant)', 'Rappi (Challenger)', 'Keeta (Aggressive)', '99Food', 'Others'],
+                datasets: [{
+                    data: [80, 14, 3, 2, 1], 
+                    backgroundColor: [
+                        '#EA1D2C', // iFood Red
+                        '#F36E65', // Rappi Orange
+                        '#F6C90E', // Keeta Yellow
+                        '#555555', // 99Food Grey
+                        '#E2E8F0'  // Others
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            };
+
+            const config = {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15,
+                                font: { family: "'Inter', sans-serif", size: 11 },
+                                boxWidth: 8
+                            }
+                        }
+                    },
+                    cutout: '40%' 
+                }
+            };
+            myChart = new Chart(ctx, config);
+        }
+
+        function updateChart() { myChart.update(); }
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
