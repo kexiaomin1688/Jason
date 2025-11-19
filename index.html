@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>外卖信息整合平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind 配置 - 调整平台颜色 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FF7A00',
+            meituan: '#FFC107', // 美团黄
+            eleme: '#1677FF',   // 饿了么蓝
+            ifood: '#F44336',   // IFOOD红
+            dd: '#FF9800',      // DoorDash橘色
+            n99: '#36B37E',     // 99food绿
+            secondary: '#36B37E',
+            accent: '#FF5630',
+            dark: '#2D3748',
+            light: '#F7FAFC'
+          },
+          fontFamily: {
+            inter: ['Inter', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-hover {
+        @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+      }
+      .text-balance {
+        text-wrap: balance;
+      }
+      .platform-tag {
+        @apply text-xs px-2 py-0.5 rounded-full font-medium;
+      }
+      .section-divider {
+        @apply h-1 w-24 mx-auto rounded-full bg-primary/30 my-12;
+      }
+      .btn-effect {
+        @apply transform transition-all duration-300 hover:scale-105 active:scale-95;
+      }
+    }
+  </style>
+</head>
+
+<body class="font-inter bg-gray-50 text-dark antialiased">
+  <!-- 导航栏 -->
+  <header id="navbar" class="fixed w-full bg-white/95 shadow-sm z-50 transition-all duration-300">
+    <div class="container mx-auto px-4 py-3 flex flex-wrap justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i class="fa fa-cutlery text-primary text-2xl"></i>
+        <h1 class="text-xl font-bold text-dark" data-i18n="siteTitle">外卖情报站</h1>
+      </div>
+      
+      <!-- 语言选择器 -->
+      <div class="flex items-center space-x-2 mr-4 md:order-2">
+        <button class="language-btn text-sm px-2 py-1 rounded hover:bg-gray-100 transition-colors" data-lang="zh">中</button>
+        <button class="language-btn text-sm px-2 py-1 rounded hover:bg-gray-100 transition-colors" data-lang="en">En</button>
+        <button class="language-btn text-sm px-2 py-1 rounded hover:bg-gray-100 transition-colors" data-lang="pt">Pt</button>
+      </div>
+      
+      <nav class="hidden md:flex items-center space-x-8 md:order-3">
+        <a href="#summary" class="font-medium hover:text-primary transition-colors" data-i18n="navSummary">信息摘要</a>
+        <a href="#resources" class="font-medium hover:text-primary transition-colors" data-i18n="navResources">资源网站</a>
+        <a href="#competitors" class="font-medium hover:text-primary transition-colors" data-i18n="navCompetitors">竞争对手</a>
+        <button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-full transition-all shadow-md hover:shadow-lg btn-effect">
+          <i class="fa fa-refresh mr-1"></i> <span data-i18n="btnRefresh">实时更新</span>
+        </button>
+      </nav>
+      
+      <button class="md:hidden text-dark text-xl" id="menuToggle">
+        <i class="fa fa-bars"></i>
+      </button>
+    </div>
+    
+    <!-- 移动端菜单 -->
+    <div id="mobileMenu" class="hidden md:hidden bg-white border-t">
+      <div class="container mx-auto px-4 py-3 flex flex-col space-y-4">
+        <a href="#summary" class="font-medium py-2 hover:text-primary transition-colors" data-i18n="navSummary">信息摘要</a>
+        <a href="#resources" class="font-medium py-2 hover:text-primary transition-colors" data-i18n="navResources">资源网站</a>
+        <a href="#competitors" class="font-medium py-2 hover:text-primary transition-colors" data-i18n="navCompetitors">竞争对手</a>
+        <button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-full transition-all shadow-md hover:shadow-lg w-full btn-effect">
+          <i class="fa fa-refresh mr-1"></i> <span data-i18n="btnRefresh">实时更新</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 英雄区域 -->
+  <section class="pt-28 pb-16 bg-gradient-to-br from-primary/10 to-light relative overflow-hidden">
+    <!-- 装饰元素 -->
+    <div class="absolute -top-10 -right-10 w-40 h-40 bg-primary/5 rounded-full"></div>
+    <div class="absolute top-1/2 -left-20 w-60 h-60 bg-primary/5 rounded-full"></div>
+    
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="max-w-3xl mx-auto text-center">
+        <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight mb-6 text-balance" data-i18n="heroTitle">
+          实时外卖信息<br>一站式整合平台
+        </h1>
+        <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto" data-i18n="heroDesc">
+          聚合最新外卖资讯、行业动态和竞争对手分析，助您掌握外卖市场全景
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+          <button class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-full transition-all shadow-lg hover:shadow-xl text-lg font-medium btn-effect">
+            <i class="fa fa-search mr-2"></i><span data-i18n="btnExplore">探索信息</span>
+          </button>
+          <button class="bg-white hover:bg-gray-50 text-dark border border-gray-200 px-6 py-3 rounded-full transition-all shadow-md hover:shadow-lg text-lg font-medium btn-effect">
+            <i class="fa fa-bell mr-2"></i><span data-i18n="btnNotify">设置提醒</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 数据概览 -->
+  <section class="py-12 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div class="bg-light rounded-xl p-6 shadow-sm transform transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+          <div class="text-primary text-3xl mb-2"><i class="fa fa-newspaper-o"></i></div>
+          <h3 class="text-2xl font-bold mb-1">10+</h3>
+          <p class="text-gray-500" data-i18n="statNews">每日资讯</p>
+        </div>
+        <div class="bg-light rounded-xl p-6 shadow-sm transform transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+          <div class="text-secondary text-3xl mb-2"><i class="fa fa-link"></i></div>
+          <h3 class="text-2xl font-bold mb-1">10</h3>
+          <p class="text-gray-500" data-i18n="statResources">资源网站</p>
+        </div>
+        <div class="bg-light rounded-xl p-6 shadow-sm transform transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+          <div class="text-accent text-3xl mb-2"><i class="fa fa-line-chart"></i></div>
+          <h3 class="text-2xl font-bold mb-1">3</h3>
+          <p class="text-gray-500" data-i18n="statCompetitors">竞品分析</p>
+        </div>
+        <div class="bg-light rounded-xl p-6 shadow-sm transform transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+          <div class="text-blue-500 text-3xl mb-2"><i class="fa fa-clock-o"></i></div>
+          <h3 class="text-2xl font-bold mb-1">24h</h3>
+          <p class="text-gray-500" data-i18n="statUpdate">实时更新</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 外卖信息摘要（缩减为9个） -->
+  <section id="summary" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-6">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4" data-i18n="summaryTitle">外卖信息摘要</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto" data-i18n="summaryDesc">精选最新外卖行业动态、优惠活动和市场趋势，助您快速掌握核心信息</p>
+      </div>
+      
+      <!-- 平台标签说明 -->
+      <div class="flex flex-wrap justify-center gap-3 mb-10 text-sm">
+        <span class="flex items-center"><span class="platform-tag bg-meituan/10 text-meituan mr-1" data-i18n="tagMeituan">美团</span> <span data-i18n="tagPlatform">平台标识</span></span>
+        <span class="flex items-center"><span class="platform-tag bg-eleme/10 text-eleme mr-1" data-i18n="tagEleme">饿了么</span> <span data-i18n="tagPlatform">平台标识</span></span>
+        <span class="flex items-center"><span class="platform-tag bg-ifood/10 text-ifood mr-1" data-i18n="tagIfood">IFOOD</span> <span data-i18n="tagPlatform">平台标识</span></span>
+        <span class="flex items-center"><span class="platform-tag bg-dd/10 text-dd mr-1" data-i18n="tagDd">DoorDash</span> <span data-i18n="tagPlatform">平台标识</span></span>
+        <span class="flex items-center"><span class="platform-tag bg-n99/10 text-n99 mr-1" data-i18n="tagN99">99food</span> <span data-i18n="tagPlatform">平台标识</span></span>
+      </div>
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- 信息卡片 1 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="bg-primary/10 text-primary text-sm px-3 py-1 rounded-full" data-i18n="categoryPromo">平台活动</span>
+            <span class="platform-tag bg-meituan/10 text-meituan" data-i18n="tagMeituan">美团</span>
+            <span class="platform-tag bg-eleme/10 text-eleme" data-i18n="tagEleme">饿了么</span>
+            <span class="ml-auto text-gray-400 text-sm" data-i18n="time2h">2小时前</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="news1Title">夏季美食节活动上线，多家平台推出满减优惠</h3>
+          <p class="text-gray-600 mb-4" data-i18n="news1Desc">主流外卖平台同步启动夏季促销，最高满减达50元，烧烤、小龙虾品类折扣力度最大。</p>
+          <a href="#" class="text-primary font-medium hover:underline flex items-center">
+            <span data-i18n="readMore">查看详情</span> <i class="fa fa-arrow-right ml-1 text-sm"></i>
+          </a>
+        </div>
+        
+        <!-- 信息卡片 2 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="bg-secondary/10 text-secondary text-sm px-3 py-1 rounded-full" data-i18n="categoryIndustry">行业动态</span>
+            <span class="platform-tag bg-dd/10 text-dd" data-i18n="tagDd">DoorDash</span>
+            <span class="platform-tag bg-ifood/10 text-ifood" data-i18n="tagIfood">IFOOD</span>
+            <span class="ml-auto text-gray-400 text-sm" data-i18n="time5h">5小时前</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="news2Title">外卖配送费上涨，多家平台调整计价方式</h3>
+          <p class="text-gray-600 mb-4" data-i18n="news2Desc">受油价上涨影响，多家平台调整配送费计算方式，远距离订单费用平均上涨15%-20%。</p>
+          <a href="#" class="text-primary font-medium hover:underline flex items-center">
+            <span data-i18n="readMore">查看详情</span> <i class="fa fa-arrow-right ml-1 text-sm"></i>
+          </a>
+        </div>
+        
+        <!-- 信息卡片 3 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="bg-accent/10 text-accent text-sm px-3 py-1 rounded-full" data-i18n="categoryNew">新品上线</span>
+            <span class="platform-tag bg-eleme/10 text-eleme" data-i18n="tagEleme">饿了么</span>
+            <span class="ml-auto text-gray-400 text-sm" data-i18n="timeYesterday">昨天</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="news3Title">连锁咖啡品牌推出外卖专属新品，限时7折</h3>
+          <p class="text-gray-600 mb-4" data-i18n="news3Desc">知名咖啡品牌针对外卖渠道推出3款新品，通过平台下单可享7折优惠，活动持续一周。</p>
+          <a href="#" class="text-primary font-medium hover:underline flex items-center">
+            <span data-i18n="readMore">查看详情</span> <i class="fa fa-arrow-right ml-1 text-sm"></i>
+          </a>
+        </div>
+        
+        <!-- 信息卡片 4 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="bg-blue-100 text-blue-600 text-sm px-3 py-1 rounded-full" data-i18n="categoryPolicy">政策法规</span>
+            <span class="platform-tag bg-meituan/10 text-meituan" data-i18n="tagMeituan">美团</span>
+            <span class="platform-tag bg-eleme/10 text-eleme" data-i18n="tagEleme">饿了么</span>
+            <span class="ml-auto text-gray-400 text-sm" data-i18n="timeYesterday">昨天</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="news4Title">外卖包装新规实施，环保包装使用率需达80%</h3>
+          <p class="text-gray-600 mb-4" data-i18n="news4Desc">新修订的外卖包装环保标准正式实施，要求平台商户环保包装使用率不低于80%，违规将面临处罚。</p>
+          <a href="#" class="text-primary font-medium hover:underline flex items-center">
+            <span data-i18n="readMore">查看详情</span> <i class="fa fa-arrow-right ml-1 text-sm"></i>
+          </a>
+        </div>
+        
+        <!-- 信息卡片 5 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="bg-purple-100 text-purple-600 text-sm px-3 py-1 rounded-full" data-i18n="categoryData">市场数据</span>
+            <span class="platform-tag bg-n99/10 text-n99" data-i18n="tagN99">99food</span>
+            <span class="ml-auto text-gray-400 text-sm" data-i18n="time2d">2天前</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="news5Title">Q2外卖市场报告发布，用户规模突破5亿</h3>
+          <p class="text-gray-600 mb-4" data-i18n="news5Desc">最新季度报告显示，外卖用户规模达5.2亿，同比增长8.3%，下沉市场成为主要增长点。</p>
+          <a href="#" class="text-primary font-medium hover:underline flex items-center">
+            <span data-i18n="readMore">查看详情</span> <i class="fa fa-arrow-right ml-1 text-sm"></i>
+          </a>
+        </div>
+        
+        <!-- 信息卡片 6 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="bg-green-100 text-green-600 text-sm px-3 py-1 rounded-full" data-i18n="categorySafety">食品安全</span>
+            <span class="platform-tag bg-meituan/10 text-meituan" data-i18n="tagMeituan">美团</span>
+            <span class="platform-tag bg-dd/10 text-dd" data-i18n="tagDd">DoorDash</span>
+            <span class="ml-auto text-gray-400 text-sm" data-i18n="time2d">2天前</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="news6Title">平台强化商户审核，下线不合规餐厅超2000家</h3>
+          <p class="text-gray-600 mb-4" data-i18n="news6Desc">各大平台开展食品安全专项整治，累计下线证件不全、卫生不达标商户2300余家，合格率提升至96%。</p>
+          <a href="#" class="text-primary font-medium hover:underline flex items-center">
+            <span data-i18n="readMore">查看详情</span> <i class="fa fa-arrow-right ml-1 text-sm"></i>
+          </a>
+        </div>
+        
+        <!-- 信息卡片 7 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="bg-yellow-100 text-yellow-600 text-sm px-3 py-1 rounded-full" data-i18n="categoryTech">技术创新</span>
+            <span class="platform-tag bg-eleme/10 text-eleme" data-i18n="tagEleme">饿了么</span>
+            <span class="ml-auto text-gray-400 text-sm" data-i18n="time3d">3天前</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="news7Title">无人配送覆盖范围扩大，3个城市试点无人机送餐</h3>
+          <p class="text-gray-600 mb-4" data-i18n="news7Desc">某头部平台宣布扩大无人配送服务范围，新增3个试点城市，无人机配送最快15分钟可达。</p>
+          <a href="#" class="text-primary font-medium hover:underline flex items-center">
+            <span data-i18n="readMore">查看详情</span> <i class="fa fa-arrow-right ml-1 text-sm"></i>
+          </a>
+        </div>
+        
+        <!-- 信息卡片 8 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="bg-red-100 text-red-600 text-sm px-3 py-1 rounded-full" data-i18n="categoryFeedback">用户反馈</span>
+            <span class="platform-tag bg-ifood/10 text-ifood" data-i18n="tagIfood">IFOOD</span>
+            <span class="platform-tag bg-n99/10 text-n99" data-i18n="tagN99">99food</span>
+            <span class="ml-auto text-gray-400 text-sm" data-i18n="time3d">3天前</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="news8Title">用户满意度调查：配送时效成为最关注因素</h3>
+          <p class="text-gray-600 mb-4" data-i18n="news8Desc">最新用户调研显示，78%的消费者将配送时效性列为选择外卖平台的首要考虑因素，其次是价格。</p>
+          <a href="#" class="text-primary font-medium hover:underline flex items-center">
+            <span data-i18n="readMore">查看详情</span> <i class="fa fa-arrow-right ml-1 text-sm"></i>
+          </a>
+        </div>
+        
+        <!-- 信息卡片 9 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="bg-indigo-100 text-indigo-600 text-sm px-3 py-1 rounded-full" data-i18n="categoryCoop">合作动态</span>
+            <span class="platform-tag bg-meituan/10 text-meituan" data-i18n="tagMeituan">美团</span>
+            <span class="platform-tag bg-dd/10 text-dd" data-i18n="tagDd">DoorDash</span>
+            <span class="ml-auto text-gray-400 text-sm" data-i18n="time4d">4天前</span>
+          </div>
+          <h3 class="font-semibold text-lg mb-2" data-i18n="news9Title">平台与连锁超市达成战略合作，生鲜配送时效提升至30分钟</h3>
+          <p class="text-gray-600 mb-4" data-i18n="news9Desc">两大平台分别与头部连锁超市签订战略合作协议，优化生鲜配送网络，承诺核心区域30分钟送达。</p>
+          <a href="#" class="text-primary font-medium hover:underline flex items-center">
+            <span data-i18n="readMore">查看详情</span> <i class="fa fa-arrow-right ml-1 text-sm"></i>
+          </a>
+        </div>
+      </div>
+      
+      <div class="text-center mt-10">
+        <button class="bg-white hover:bg-gray-50 text-dark border border-gray-200 px-6 py-3 rounded-full transition-all shadow-sm hover:shadow-md font-medium btn-effect">
+          <span data-i18n="loadMore">加载更多</span> <i class="fa fa-angle-down ml-1"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 外卖信息内容网站 -->
+  <section id="resources" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-6">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4" data-i18n="resourcesTitle">外卖信息资源网站</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto" data-i18n="resourcesDesc">精选优质外卖信息网站，涵盖行业资讯、数据报告和商家资源</p>
+      </div>
+      
+      <!-- 链接访问提示 -->
+      <p class="text-amber-600 text-sm mt-3 flex items-center justify-center mb-10">
+        <i class="fa fa-info-circle mr-1"></i> <span data-i18n="linkTip">若链接无法直接访问，可尝试复制链接到浏览器打开</span>
+      </p>
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <!-- 网站链接 1 -->
+        <div class="bg-light rounded-xl p-6 flex flex-col items-center text-center card-hover group">
+          <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+            <i class="fa fa-newspaper-o text-primary text-xl"></i>
+          </div>
+          <h3 class="font-semibold mb-2" data-i18n="site1Title">外卖行业新闻网</h3>
+          <p class="text-gray-500 text-sm mb-3" data-i18n="site1Desc">最新外卖行业动态与分析</p>
+          <div class="flex items-center gap-2 w-full justify-center">
+            <a href="/redirect?url=https://www.fooddeliverynews.com" target="_blank" class="text-primary text-sm hover:underline flex items-center">
+              <i class="fa fa-external-link mr-1"></i> <span data-i18n="visit">访问</span>
+            </a>
+            <button onclick="copyLink('https://www.fooddeliverynews.com')" class="text-gray-500 text-sm hover:text-primary transition-colors">
+              <i class="fa fa-copy"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- 网站链接 2 -->
+        <div class="bg-light rounded-xl p-6 flex flex-col items-center text-center card-hover group">
+          <div class="w-14 h-14 bg-secondary/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-secondary/20 transition-colors">
+            <i class="fa fa-bar-chart text-secondary text-xl"></i>
+          </div>
+          <h3 class="font-semibold mb-2" data-i18n="site2Title">餐饮数据中心</h3>
+          <p class="text-gray-500 text-sm mb-3" data-i18n="site2Desc">外卖市场数据与统计报告</p>
+          <div class="flex items-center gap-2 w-full justify-center">
+            <a href="/redirect?url=https://www.foodstats.com" target="_blank" class="text-primary text-sm hover:underline flex items-center">
+              <i class="fa fa-external-link mr-1"></i> <span data-i18n="visit">访问</span>
+            </a>
+            <button onclick="copyLink('https://www.foodstats.com')" class="text-gray-500 text-sm hover:text-primary transition-colors">
+              <i class="fa fa-copy"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- 网站链接 3 -->
+        <div class="bg-light rounded-xl p-6 flex flex-col items-center text-center card-hover group">
+          <div class="w-14 h-14 bg-accent/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-colors">
+            <i class="fa fa-cutlery text-accent text-xl"></i>
+          </div>
+          <h3 class="font-semibold mb-2" data-i18n="site3Title">餐饮商业在线</h3>
+          <p class="text-gray-500 text-sm mb-3" data-i18n="site3Desc">餐厅经营与外卖策略指南</p>
+          <div class="flex items-center gap-2 w-full justify-center">
+            <a href="/redirect?url=https://www.restaurantbusinessonline.com" target="_blank" class="text-primary text-sm hover:underline flex items-center">
+              <i class="fa fa-external-link mr-1"></i> <span data-i18n="visit">访问</span>
+            </a>
+            <button onclick="copyLink('https://www.restaurantbusinessonline.com')" class="text-gray-500 text-sm hover:text-primary transition-colors">
+              <i class="fa fa-copy"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- 网站链接 4 -->
+        <div class="bg-light rounded-xl p-6 flex flex-col items-center text-center card-hover group">
+          <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
+            <i class="fa fa-motorcycle text-blue-500 text-xl"></i>
+          </div>
+          <h3 class="font-semibold mb-2" data-i18n="site4Title">配送员联盟</h3>
+          <p class="text-gray-500 text-sm mb-3" data-i18n="site4Desc">配送行业资讯与骑手社区</p>
+          <div class="flex items-center gap-2 w-full justify-center">
+            <a href="/redirect?url=https://www.deliverydrivers.org" target="_blank" class="text-primary text-sm hover:underline flex items-center">
+              <i class="fa fa-external-link mr-1"></i> <span data-i18n="visit">访问</span>
+            </a>
+            <button onclick="copyLink('https://www.deliverydrivers.org')" class="text-gray-500 text-sm hover:text-primary transition-colors">
+              <i class="fa fa-copy"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- 网站链接 5 -->
+        <div class="bg-light rounded-xl p-6 flex flex-col items-center text-center card-hover group">
+          <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-green-200 transition-colors">
+            <i class="fa fa-shield text-green-500 text-xl"></i>
+          </div>
+          <h3 class="font-semibold mb-2" data-i18n="site5Title">食品安全新闻</h3>
+          <p class="text-gray-500 text-sm mb-3" data-i18n="site5Desc">外卖食品安全标准与监管</p>
+          <div class="flex items-center gap-2 w-full justify-center">
+            <a href="/redirect?url=https://www.foodsafetynews.com" target="_blank" class="text-primary text-sm hover:underline flex items-center">
+              <i class="fa fa-external-link mr-1"></i> <span data-i18n="visit">访问</span>
+            </a>
+            <button onclick="copyLink('https://www.foodsafetynews.com')" class="text-gray-500 text-sm hover:text-primary transition-colors">
+              <i class="fa fa-copy"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- 网站链接 6 -->
+        <div class="bg-light rounded-xl p-6 flex flex-col items-center text-center card-hover group">
+          <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-200 transition-colors">
+            <i class="fa fa-file-text-o text-purple-500 text-xl"></i>
+          </div>
+          <h3 class="font-semibold mb-2" data-i18n="site6Title">在线餐饮报告</h3>
+          <p class="text-gray-500 text-sm mb-3" data-i18n="site6Desc">外卖行业深度研究报告</p>
+          <div class="flex items-center gap-2 w-full justify-center">
+            <a href="/redirect?url=https://www.onlinefoodreport.com" target="_blank" class="text-primary text-sm hover:underline flex items-center">
+              <i class="fa fa-external-link mr-1"></i> <span data-i18n="visit">访问</span>
+            </a>
+            <button onclick="copyLink('https://www.onlinefoodreport.com')" class="text-gray-500 text-sm hover:text-primary transition-colors">
+              <i class="fa fa-copy"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- 网站链接 7 -->
+        <div class="bg-light rounded-xl p-6 flex flex-col items-center text-center card-hover group">
+          <div class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-yellow-200 transition-colors">
+            <i class="fa fa-plug text-yellow-500 text-xl"></i>
+          </div>
+          <h3 class="font-semibold mb-2" data-i18n="site7Title">食品科技连线</h3>
+          <p class="text-gray-500 text-sm mb-3" data-i18n="site7Desc">外卖科技应用与创新趋势</p>
+          <div class="flex items-center gap-2 w-full justify-center">
+            <a href="/redirect?url=https://www.foodtechconnect.com" target="_blank" class="text-primary text-sm hover:underline flex items-center">
+              <i class="fa fa-external-link mr-1"></i> <span data-i18n="visit">访问</span>
+            </a>
+            <button onclick="copyLink('https://www.foodtechconnect.com')" class="text-gray-500 text-sm hover:text-primary transition-colors">
+              <i class="fa fa-copy"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- 网站链接 8 -->
+        <div class="bg-light rounded-xl p-6 flex flex-col items-center text-center card-hover group">
+          <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-red-200 transition-colors">
+            <i class="fa fa-bullhorn text-red-500 text-xl"></i>
+          </div>
+          <h3 class="font-semibold mb-2" data-i18n="site8Title">餐厅营销网</h3>
+          <p class="text-gray-500 text-sm mb-3" data-i18n="site8Desc">外卖营销策略与推广技巧</p>
+          <div class="flex items-center gap-2 w-full justify-center">
+            <a href="/redirect?url=https://www.restaurantmarketing.com" target="_blank" class="text-primary text-sm hover:underline flex items-center">
+              <i class="fa fa-external-link mr-1"></i> <span data-i18n="visit">访问</span>
+            </a>
+            <button onclick="copyLink('https://www.restaurantmarketing.com')" class="text-gray-500 text-sm hover:text-primary transition-colors">
+              <i class="fa fa-copy"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- 网站链接 9 -->
+        <div class="bg-light rounded-xl p-6 flex flex-col items-center text-center card-hover group">
+          <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-indigo-200 transition-colors">
+            <i class="fa fa-gavel text-indigo-500 text-xl"></i>
+          </div>
+          <h3 class="font-semibold mb-2" data-i18n="site9Title">外卖法律资讯</h3>
+          <p class="text-gray-500 text-sm mb-3" data-i18n="site9Desc">外卖行业法规与法律解读</p>
+          <div class="flex items-center gap-2 w-full justify-center">
+            <a href="/redirect?url=https://www.fooddeliverylaw.com" target="_blank" class="text-primary text-sm hover:underline flex items-center">
+              <i class="fa fa-external-link mr-1"></i> <span data-i18n="visit">访问</span>
+            </a>
+            <button onclick="copyLink('https://www.fooddeliverylaw.com')" class="text-gray-500 text-sm hover:text-primary transition-colors">
+              <i class="fa fa-copy"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- 网站链接 10 -->
+        <div class="bg-light rounded-xl p-6 flex flex-col items-center text-center card-hover group">
+          <div class="w-14 h-14 bg-pink-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-pink-200 transition-colors">
+            <i class="fa fa-globe text-pink-500 text-xl"></i>
+          </div>
+          <h3 class="font-semibold mb-2" data-i18n="site10Title">全球餐饮论坛</h3>
+          <p class="text-gray-500 text-sm mb-3" data-i18n="site10Desc">国际外卖市场动态与交流</p>
+          <div class="flex items-center gap-2 w-full justify-center">
+            <a href="/redirect?url=https://www.globalfoodserviceforum.com" target="_blank" class="text-primary text-sm hover:underline flex items-center">
+              <i class="fa fa-external-link mr-1"></i> <span data-i18n="visit">访问</span>
+            </a>
+            <button onclick="copyLink('https://www.globalfoodserviceforum.com')" class="text-gray-500 text-sm hover:text-primary transition-colors">
+              <i class="fa fa-copy"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 竞争对手信息 -->
+  <section id="competitors" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4" data-i18n="competitorsTitle">竞争对手分析</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto" data-i18n="competitorsDesc">深入解析IFOOD、99food和DoorDash三大外卖平台的核心信息与动态</p>
+        <div class="section-divider"></div>
+      </div>
+      
+      <div class="grid lg:grid-cols-3 gap-8">
+        <!-- IFOOD -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden transform transition-all duration-300 hover:shadow-lg">
+          <div class="bg-gradient-to-r from-ifood to-red-600 p-6 text-white">
+            <div class="flex items-center justify-between">
+              <h3 class="text-2xl font-bold" data-i18n="ifood">IFOOD</h3>
+              <i class="fa fa-utensils text-3xl"></i>
+            </div>
+            <p class="mt-2 opacity-90" data-i18n="ifoodDesc">巴西领先的外卖平台</p>
+          </div>
+          
+          <div class="p-6">
+            <!-- 平台标签组 -->
+            <div class="flex flex-wrap gap-2 mb-6">
+              <span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full" data-i18n="tagLeader">市场领导者</span>
+              <span class="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded-full" data-i18n="tagBrazil">巴西市场</span>
+              <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full" data-i18n="tagEfficient">高配送效率</span>
+              <span class="bg-amber-100 text-amber-700 text-xs px-2 py-1 rounded-full" data-i18n="tagLocal">本土化服务</span>
+            </div>
+            
+            <ul class="space-y-4">
+              <li>
+                <h4 class="font-semibold mb-1" data-i18n="marketCoverage">市场覆盖</h4>
+                <a href="#" class="text-gray-600 hover:text-ifood transition-colors" data-i18n="ifoodCoverage">覆盖巴西95%以上城市，拥有超过15万家合作餐厅</a>
+              </li>
+              <li>
+                <h4 class="font-semibold mb-1" data-i18n="userScale">用户规模</h4>
+                <a href="#" class="text-gray-600 hover:text-ifood transition-colors" data-i18n="ifoodUsers">注册用户超过2000万，月活跃用户达1200万</a>
+              </li>
+              <li>
+                <h4 class="font-semibold mb-1" data-i18n="coreAdvantage">核心优势</h4>
+                <a href="#" class="text-gray-600 hover:text-ifood transition-colors" data-i18n="ifoodAdvantage">本土化服务完善，支付方式多样，配送效率高</a>
+              </li>
+              <li>
+                <h4 class="font-semibold mb-1" data-i18n="latestNews">最新动态</h4>
+                <a href="#" class="text-gray-600 hover:text-ifood transition-colors" data-i18n="ifoodNews">推出订阅制会员服务，月费9.9雷亚尔享免配送费</a>
+              </li>
+              <li>
+                <h4 class="font-semibold mb-1" data-i18n="marketShare">市场份额</h4>
+                <a href="#" class="text-gray-600 hover:text-ifood transition-colors" data-i18n="ifoodShare">巴西外卖市场占有率约45%，稳居行业第一</a>
+              </li>
+            </ul>
+            
+            <div class="mt-6 pt-6 border-t border-gray-100">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm text-gray-500" data-i18n="userSatisfaction">用户满意度</span>
+                <span class="text-sm font-medium">4.2/5</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-ifood h-2 rounded-full" style="width: 84%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 99food -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden transform transition-all duration-300 hover:shadow-lg">
+          <div class="bg-gradient-to-r from-n99 to-green-600 p-6 text-white">
+            <div class="flex items-center justify-between">
+              <h3 class="text-2xl font-bold" data-i18n="n99food">99food</h3>
+              <i class="fa fa-shopping-bag text-3xl"></i>
+            </div>
+            <p class="mt-2 opacity-90" data-i18n="n99foodDesc">拉美地区快速增长的外卖平台</p>
+          </div>
+          
+          <div class="p-6">
+            <!-- 平台标签组 -->
+            <div class="flex flex-wrap gap-2 mb-6">
+              <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full" data-i18n="tagGrowth">快速增长</span>
+              <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full" data-i18n="tagLatin">拉美市场</span>
+              <span class="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded-full" data-i18n="tagFresh">生鲜配送</span>
+              <span class="bg-amber-100 text-amber-700 text-xs px-2 py-1 rounded-full" data-i18n="tagAffordable">价格亲民</span>
+            </div>
+            
+            <ul class="space-y-4">
+              <li>
+                <h4 class="font-semibold mb-1" data-i18n="marketCoverage">市场覆盖</h4>
+                <a href="#" class="text-gray-600 hover:text-n99 transition-colors" data-i18n="n99Coverage">主要覆盖巴西、墨西哥、阿根廷等8个拉美国家</a>
+              </li>
+              <li>
+                <h4 class="font-semibold mb-1" data-i18n="userScale">用户规模</h4>
+                <a href="#" class="text-gray-600 hover:text-n99 transition-colors" data-i18n="n99Users">注册用户1500万，年增长率达65%</a>
+              </li>
+              <li>
+                <h4 class="font-semibold mb-1" data-i18n="coreAdvantage">核心优势</h4>
+                <a href="#" class="text-gray-600 hover:text-n99 transition-colors" data-i18n="n99Advantage">价格亲民，与本地超市合作紧密，生鲜配送领先</a>
+              </li>
+              <li>
+                <h4 class="font-semibold mb-1" data-i18n="latestNews">最新动态</h4>
+                <a href="#" class="text-gray-600 hover:text-n99 transition-colors" data-i18n="n99News">完成1亿美元融资，计划拓展至欧洲市场</a>
+              </li>
+              <li>
+                <h4 class="font-semibold mb-1" data-i18n="featureService">特色服务</h4>
+                <a href="#" class="text-gray-600 hover:text-n99 transition-colors" data-i18n="n99Service">推出"99分钟达"承诺，超时自动赔付优惠券</a>
+              </li>
+            </ul>
+            
+            <div class="mt-6 pt-6 border-t border-gray-100">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm text-gray-500" data-i18n="userSatisfaction">用户满意度</span>
+                <span class="text-sm font-medium">4.0/5</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-n99 h-2 rounded-full" style="width: 80%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- DoorDash -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden transform transition-all duration-300 hover:shadow-lg">
+          <div class="bg-gradient-to-r from-dd to-orange-500 p-6 text-white">
+            <div class="flex items-center justify-between">
+              <h3 class="text-2xl font-bold" data-i18n="doordash">DoorDash</h3>
+              <i class="fa fa-truck text-3xl"></i>
+            </div>
+            <p class="mt-2 opacity-90" data-i18n="doordashDesc">美国最大的外卖配送平台</p>
+          </div>
+          
+          <div class="p-6">
+            <!-- 平台标签组 -->
+            <div class="flex flex-wrap gap-2 mb-6">
+              <span class="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full" data-i18n="tagNorthAmerica">北美龙头</span>
+              <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full" data-i18n="tagGlobal">全球扩张</span>
+              <span class="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded-full" data-i18n="tagTech">技术领先</span>
+              <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full" data-i18n="tagHighSatisfaction">高满意度</span>
+            </div>
+            
+            <ul class="space-y-4">
+              <li>
+                <h4 class="font-semibold mb-1" data-i18n="marketCoverage">市场覆盖</h4>
+                <a href="#" class="text-gray-600 hover:text-dd transition-colors" data-i18n="ddCoverage">覆盖美国、加拿大、澳大利亚等多个国家，超7000个城市</a>
+              </li>
+              <li>
+                <h4 class="font-semibold mb-1" data-i18n="userScale">用户规模</h4>
+                <a href="#" class="text-gray-600 hover:text-dd transition-colors" data-i18n="ddUsers">月活跃用户3200万，合作商家超过39万家</a>
+              </li>
+              <li>
+                <h4 class="font-semibold mb-1" data-i18n="coreAdvantage">核心优势</h4>
+                <a href="#" class="text-gray-600 hover:text-dd transition-colors" data-i18n="ddAdvantage">配送网络庞大，技术领先，商家服务完善</a>
+              </li>
+              <li>
+                <h4 class="font-semibold mb-1" data-i18n="latestNews">最新动态</h4>
+                <a href="#" class="text-gray-600 hover:text-dd transition-colors" data-i18n="ddNews">推出快速配送服务DashPass，订阅用户突破500万</a>
+              </li>
+              <li>
+                <h4 class="font-semibold mb-1" data-i18n="financialData">财务数据</h4>
+                <a href="#" class="text-gray-600 hover:text-dd transition-colors" data-i18n="ddFinance">2023年营收超65亿美元，同比增长25%</a>
+              </li>
+            </ul>
+            
+            <div class="mt-6 pt-6 border-t border-gray-100">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm text-gray-500" data-i18n="userSatisfaction">用户满意度</span>
+                <span class="text-sm font-medium">4.5/5</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-dd h-2 rounded-full" style="width: 90%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 竞品对比图表 -->
+      <div class="mt-12 bg-white rounded-xl shadow-sm p-6 transform transition-all duration-300 hover:shadow-md">
+        <h3 class="text-xl font-bold mb-6 text-center" data-i18n="chartTitle">三大平台市场份额对比</h3>
+        <div class="h-80">
+          <canvas id="marketShareChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 订阅区域 -->
+  <section class="py-16 bg-primary/10 relative overflow-hidden">
+    <!-- 装饰元素 -->
+    <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-primary/5 rounded-full"></div>
+    <div class="absolute top-10 right-10 w-32 h-32 bg-primary/5 rounded-full"></div>
+    
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4" data-i18n="subscribeTitle">获取最新外卖资讯</h2>
+        <p class="text-gray-600 mb-8" data-i18n="subscribeDesc">订阅我们的通讯，第一时间获取外卖行业动态、优惠信息和竞品分析</p>
+        
+        <form class="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
+          <input type="email" placeholder="请输入您的邮箱地址" class="flex-1 px-4 py-3 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all" data-i18n-placeholder="emailPlaceholder">
+          <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-full transition-all shadow-md hover:shadow-lg font-medium whitespace-nowrap btn-effect">
+            <span data-i18n="subscribeBtn">立即订阅</span> <i class="fa fa-paper-plane ml-1"></i>
+          </button>
+        </form>
+        
+        <p class="text-gray-500 text-sm mt-4" data-i18n="privacyNote">我们尊重您的隐私，不会向第三方分享您的信息</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="bg-dark text-white pt-16 pb-8">
+    <div class="container mx-auto px-4">
+      <div class="grid md:grid-cols-4 gap-8 mb-12">
+        <div>
+          <div class="flex items-center space-x-2 mb-4">
+            <i class="fa fa-cutlery text-primary text-2xl"></i>
+            <h3 class="text-xl font-bold" data-i18n="siteTitle">外卖情报站</h3>
+          </div>
+          <p class="text-gray-400 mb-4" data-i18n="footerDesc">实时整合外卖行业信息，助力您把握市场动态</p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fa fa-facebook"></i></a>
+            <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fa fa-twitter"></i></a>
+            <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fa fa-instagram"></i></a>
+            <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fa fa-linkedin"></i></a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-semibold mb-4" data-i18n="quickLinks">快速链接</h4>
+          <ul class="space-y-2">
+            <li><a href="#summary" class="text-gray-400 hover:text-white transition-colors" data-i18n="navSummary">信息摘要</a></li>
+            <li><a href="#resources" class="text-gray-400 hover:text-white transition-colors" data-i18n="navResources">资源网站</a></li>
+            <li><a href="#competitors" class="text-gray-400 hover:text-white transition-colors" data-i18n="navCompetitors">竞争对手</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="aboutUs">关于我们</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="contactUs">联系方式</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-semibold mb-4" data-i18n="resourceCenter">资源中心</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="industryReport">行业报告</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="marketAnalysis">市场分析</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="operationGuide">经营指南</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="regulationInterpretation">法规解读</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="dataDownload">数据下载</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-semibold mb-4" data-i18n="contactUs">联系我们</h4>
+          <ul class="space-y-2">
+            <li class="flex items-start">
+              <i class="fa fa-map-marker text-primary mt-1 mr-3"></i>
+              <span class="text-gray-400" data-i18n="address">北京市朝阳区科技园A座1001室</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fa fa-phone text-primary mr-3"></i>
+              <span class="text-gray-400" data-i18n="phone">+86 10 8888 7777</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fa fa-envelope text-primary mr-3"></i>
+              <span class="text-gray-400" data-i18n="email">info@waimaiinfo.com</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
+        <p data-i18n="copyright">&copy; 2023 外卖情报站 版权所有 | 京ICP备12345678号</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 返回顶部按钮 -->
+  <button id="backToTop" class="fixed bottom-6 right-6 bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg opacity-0 invisible transition-all duration-300 hover:bg-primary/90 btn-effect">
+    <i class="fa fa-arrow-up"></i>
+  </button>
+
+  <!-- JavaScript -->
+  <script>
+    // 多语言支持
+    const translations = {
+      zh: {
+        siteTitle: "外卖情报站",
+        navSummary: "信息摘要",
+        navResources: "资源网站",
+        navCompetitors: "竞争对手",
+        btnRefresh: "实时更新",
+        heroTitle: "实时外卖信息<br>一站式整合平台",
+        heroDesc: "聚合最新外卖资讯、行业动态和竞争对手分析，助您掌握外卖市场全景",
+        btnExplore: "探索信息",
+        btnNotify: "设置提醒",
+        statNews: "每日资讯",
+        statResources: "资源网站",
+        statCompetitors: "竞品分析",
+        statUpdate: "实时更新",
+        summaryTitle: "外卖信息摘要",
+        summaryDesc: "精选最新外卖行业动态、优惠活动和市场趋势，助您快速掌握核心信息",
+        tagMeituan: "美团",
+        tagEleme: "饿了么",
+        tagIfood: "IFOOD",
+        tagDd: "DoorDash",
+        tagN99: "99food",
+        tagPlatform: "平台标识",
+        categoryPromo: "平台活动",
+        categoryIndustry: "行业动态",
+        categoryNew: "新品上线",
+        categoryPolicy: "政策法规",
+        categoryData: "市场数据",
+        categorySafety: "食品安全",
+        categoryTech: "技术创新",
+        categoryFeedback: "用户反馈",
+        categoryCoop: "合作动态",
+        time2h: "2小时前",
+        time5h: "5小时前",
+        timeYesterday: "昨天",
+        time2d: "2天前",
+        time3d: "3天前",
+        time4d: "4天前",
+        news1Title: "夏季美食节活动上线，多家平台推出满减优惠",
+        news1Desc: "主流外卖平台同步启动夏季促销，最高满减达50元，烧烤、小龙虾品类折扣力度最大。",
+        news2Title: "外卖配送费上涨，多家平台调整计价方式",
+        news2Desc: "受油价上涨影响，多家平台调整配送费计算方式，远距离订单费用平均上涨15%-20%。",
+        news3Title: "连锁咖啡品牌推出外卖专属新品，限时7折",
+        news3Desc: "知名咖啡品牌针对外卖渠道推出3款新品，通过平台下单可享7折优惠，活动持续一周。",
+        news4Title: "外卖包装新规实施，环保包装使用率需达80%",
+        news4Desc: "新修订的外卖包装环保标准正式实施，要求平台商户环保包装使用率不低于80%，违规将面临处罚。",
+        news5Title: "Q2外卖市场报告发布，用户规模突破5亿",
+        news5Desc: "最新季度报告显示，外卖用户规模达5.2亿，同比增长8.3%，下沉市场成为主要增长点。",
+        news6Title: "平台强化商户审核，下线不合规餐厅超2000家",
+        news6Desc: "各大平台开展食品安全专项整治，累计下线证件不全、卫生不达标商户2300余家，合格率提升至96%。",
+        news7Title: "无人配送覆盖范围扩大，3个城市试点无人机送餐",
+        news7Desc: "某头部平台宣布扩大无人配送服务范围，新增3个试点城市，无人机配送最快15分钟可达。",
+        news8Title: "用户满意度调查：配送时效成为最关注因素",
+        news8Desc: "最新用户调研显示，78%的消费者将配送时效性列为选择外卖平台的首要考虑因素，其次是价格。",
+        news9Title: "平台与连锁超市达成战略合作，生鲜配送时效提升至30分钟",
+        news9Desc: "两大平台分别与头部连锁超市签订战略合作协议，优化生鲜配送网络，承诺核心区域30分钟送达。",
+        readMore: "查看详情",
+        loadMore: "加载更多",
+        resourcesTitle: "外卖信息资源网站",
+        resourcesDesc: "精选优质外卖信息网站，涵盖行业资讯、数据报告和商家资源",
+        linkTip: "若链接无法直接访问，可尝试复制链接到浏览器打开",
+        site1Title: "外卖行业新闻网",
+        site1Desc: "最新外卖行业动态与分析",
+        site2Title: "餐饮数据中心",
+        site2Desc: "外卖市场数据与统计报告",
+        site3Title: "餐饮商业在线",
+        site3Desc: "餐厅经营与外卖策略指南",
+        site4Title: "配送员联盟",
+        site4Desc: "配送行业资讯与骑手社区",
+        site5Title: "食品安全新闻",
+        site5Desc: "外卖食品安全标准与监管",
+        site6Title: "在线餐饮报告",
+        site6Desc: "外卖行业深度研究报告",
+        site7Title: "食品科技连线",
+        site7Desc: "外卖科技应用与创新趋势",
+        site8Title: "餐厅营销网",
+        site8Desc: "外卖营销策略与推广技巧",
+        site9Title: "外卖法律资讯",
+        site9Desc: "外卖行业法规与法律解读",
+        site10Title: "全球餐饮论坛",
+        site10Desc: "国际外卖市场动态与交流",
+        visit: "访问",
+        competitorsTitle: "竞争对手分析",
+        competitorsDesc: "深入解析IFOOD、99food和DoorDash三大外卖平台的核心信息与动态",
+        ifood: "IFOOD",
+        ifoodDesc: "巴西领先的外卖平台",
+        tagLeader: "市场领导者",
+        tagBrazil: "巴西市场",
+        tagEfficient: "高配送效率",
+        tagLocal: "本土化服务",
+        marketCoverage: "市场覆盖",
+        ifoodCoverage: "覆盖巴西95%以上城市，拥有超过15万家合作餐厅",
+        userScale: "用户规模",
+        ifoodUsers: "注册用户超过2000万，月活跃用户达1200万",
+        coreAdvantage: "核心优势",
+        ifoodAdvantage: "本土化服务完善，支付方式多样，配送效率高",
+        latestNews: "最新动态",
+        ifoodNews: "推出订阅制会员服务，月费9.9雷亚尔享免配送费",
+        marketShare: "市场份额",
+        ifoodShare: "巴西外卖市场占有率约45%，稳居行业第一",
+        userSatisfaction: "用户满意度",
+        n99food: "99food",
+        n99foodDesc: "拉美地区快速增长的外卖平台",
+        tagGrowth: "快速增长",
+        tagLatin: "拉美市场",
+        tagFresh: "生鲜配送",
+        tagAffordable: "价格亲民",
+        n99Coverage: "主要覆盖巴西、墨西哥、阿根廷等8个拉美国家",
+        n99Users: "注册用户1500万，年增长率达65%",
+        n99Advantage: "价格亲民，与本地超市合作紧密，生鲜配送领先",
+        n99News: "完成1亿美元融资，计划拓展至欧洲市场",
+        featureService: "特色服务",
+        n99Service: "推出\"99分钟达\"承诺，超时自动赔付优惠券",
+        doordash: "DoorDash",
+        doordashDesc: "美国最大的外卖配送平台",
+        tagNorthAmerica: "北美龙头",
+        tagGlobal: "全球扩张",
+        tagTech: "技术领先",
+        tagHighSatisfaction: "高满意度",
+        ddCoverage: "覆盖美国、加拿大、澳大利亚等多个国家，超7000个城市",
+        ddUsers: "月活跃用户3200万，合作商家超过39万家",
+        ddAdvantage: "配送网络庞大，技术领先，商家服务完善",
+        ddNews: "推出快速配送服务DashPass，订阅用户突破500万",
+        financialData: "财务数据",
+        ddFinance: "2023年营收超65亿美元，同比增长25%",
+        chartTitle: "三大平台市场份额对比",
+        subscribeTitle: "获取最新外卖资讯",
+        subscribeDesc: "订阅我们的通讯，第一时间获取外卖行业动态、优惠信息和竞品分析",
+        emailPlaceholder: "请输入您的邮箱地址",
+        subscribeBtn: "立即订阅",
+        privacyNote: "我们尊重您的隐私，不会向第三方分享您的信息",
+        footerDesc: "实时整合外卖行业信息，助力您把握市场动态",
+        quickLinks: "快速链接",
+        aboutUs: "关于我们",
+        contactUs: "联系方式",
+        resourceCenter: "资源中心",
+        industryReport: "行业报告",
+        marketAnalysis: "市场分析",
+        operationGuide: "经营指南",
+        regulationInterpretation: "法规解读",
+        dataDownload: "数据下载",
+        address: "北京市朝阳区科技园A座1001室",
+        phone: "+86 10 8888 7777",
+        email: "info@waimaiinfo.com",
+        copyright: "&copy; 2023 外卖情报站 版权所有 | 京ICP备12345678号"
+      },
+      en: {
+        siteTitle: "Food Delivery Intelligence",
+        navSummary: "Information Summary",
+        navResources: "Resource Sites",
+        navCompetitors: "Competitor Analysis",
+        btnRefresh: "Real-time Update",
+        heroTitle: "Real-time Food Delivery<br>Information Hub",
+        heroDesc: "Aggregate the latest food delivery news, industry trends and competitor analysis to help you grasp the overall market",
+        btnExplore: "Explore Information",
+        btnNotify: "Set Reminders",
+        statNews: "Daily News",
+        statResources: "Resource Sites",
+        statCompetitors: "Competitor Analysis",
+        statUpdate: "24h Update",
+        summaryTitle: "Information Summary",
+        summaryDesc: "Selected latest food delivery industry trends, promotions and market trends to help you quickly grasp key information",
+        tagMeituan: "Meituan",
+        tagEleme: "Ele.me",
+        tagIfood: "IFOOD",
+        tagDd: "DoorDash",
+        tagN99: "99food",
+        tagPlatform: "Platform tag",
+        categoryPromo: "Platform Activities",
+        categoryIndustry: "Industry Trends",
+        categoryNew: "New Products",
+        categoryPolicy: "Policies & Regulations",
+        categoryData: "Market Data",
+        categorySafety: "Food Safety",
+        categoryTech: "Technological Innovation",
+        categoryFeedback: "User Feedback",
+        categoryCoop: "Cooperation News",
+        time2h: "2 hours ago",
+        time5h: "5 hours ago",
+        timeYesterday: "Yesterday",
+        time2d: "2 days ago",
+        time3d: "3 days ago",
+        time4d: "4 days ago",
+        news1Title: "Summer Food Festival launched with multiple platforms offering discounts",
+        news1Desc: "Major food delivery platforms simultaneously launched summer promotions, with maximum discounts up to ¥50, especially for barbecue and crayfish.",
+        news2Title: "Delivery fees increase as multiple platforms adjust pricing",
+        news2Desc: "Affected by rising fuel prices, several platforms adjusted delivery fee calculation methods, with long-distance orders increasing by 15%-20% on average.",
+        news3Title: "Chain coffee brand launches takeaway-exclusive new products with 30% off",
+        news3Desc: "A well-known coffee brand launched 3 new products for takeaway channels, with 30% off when ordering through the platform, valid for one week.",
+        news4Title: "New takeaway packaging regulations implemented, requiring 80% eco-friendly packaging",
+        news4Desc: "The newly revised environmental protection standards for takeaway packaging have been officially implemented, requiring platform merchants to use at least 80% eco-friendly packaging.",
+        news5Title: "Q2 food delivery market report released, user scale exceeds 500 million",
+        news5Desc: "The latest quarterly report shows that the number of food delivery users reached 520 million, an 8.3% year-on-year increase, with sinking markets as the main growth driver.",
+        news6Title: "Platforms strengthen merchant audits, removing over 2,000 non-compliant restaurants",
+        news6Desc: "Major platforms carried out special food safety rectification, removing more than 2,300 merchants with incomplete certificates or poor hygiene, raising the pass rate to 96%.",
+        news7Title: "Unmanned delivery expands coverage, 3 cities pilot drone food delivery",
+        news7Desc: "A leading platform announced expanding unmanned delivery services to 3 new pilot cities, with drone delivery reaching destinations in as fast as 15 minutes.",
+        news8Title: "User satisfaction survey: delivery time becomes top concern",
+        news8Desc: "The latest user survey shows that 78% of consumers list delivery timeliness as the primary factor when choosing a food delivery platform, followed by price.",
+        news9Title: "Platforms reach strategic cooperation with supermarket chains, reducing fresh delivery time to 30 minutes",
+        news9Desc: "Two major platforms signed strategic cooperation agreements with leading supermarket chains to optimize fresh food delivery networks, promising 30-minute delivery in core areas.",
+        readMore: "View details",
+        loadMore: "Load more",
+        resourcesTitle: "Food Delivery Information Resources",
+        resourcesDesc: "Selected high-quality food delivery information websites covering industry news, data reports and merchant resources",
+        linkTip: "If the link cannot be accessed directly, try copying the link to your browser",
+        site1Title: "Food Delivery News",
+        site1Desc: "Latest food delivery industry news and analysis",
+        site2Title: "Food Service Data Center",
+        site2Desc: "Food delivery market data and statistical reports",
+        site3Title: "Restaurant Business Online",
+        site3Desc: "Restaurant management and takeaway strategy guides",
+        site4Title: "Delivery Drivers Alliance",
+        site4Desc: "Delivery industry information and rider community",
+        site5Title: "Food Safety News",
+        site5Desc: "Food delivery safety standards and regulations",
+        site6Title: "Online Food Service Reports",
+        site6Desc: "In-depth research reports on the food delivery industry",
+        site7Title: "Food Tech Connect",
+        site7Desc: "Food delivery technology applications and innovation trends",
+        site8Title: "Restaurant Marketing Network",
+        site8Desc: "Food delivery marketing strategies and promotion techniques",
+        site9Title: "Food Delivery Legal Information",
+        site9Desc: "Food delivery industry regulations and legal interpretations",
+        site10Title: "Global Food Service Forum",
+        site10Desc: "International food delivery market dynamics and exchanges",
+        visit: "Visit",
+        competitorsTitle: "Competitor Analysis",
+        competitorsDesc: "In-depth analysis of core information and dynamics of three major food delivery platforms: IFOOD, 99food and DoorDash",
+        ifood: "IFOOD",
+        ifoodDesc: "Leading food delivery platform in Brazil",
+        tagLeader: "Market Leader",
+        tagBrazil: "Brazil Market",
+        tagEfficient: "High Delivery Efficiency",
+        tagLocal: "Localized Service",
+        marketCoverage: "Market Coverage",
+        ifoodCoverage: "Covers over 95% of cities in Brazil with more than 150,000 partner restaurants",
+        userScale: "User Scale",
+        ifoodUsers: "Over 20 million registered users, with 12 million monthly active users",
+        coreAdvantage: "Core Advantages",
+        ifoodAdvantage: "Comprehensive localized services, diverse payment methods, high delivery efficiency",
+        latestNews: "Latest News",
+        ifoodNews: "Launched subscription-based membership service, R$9.9 per month for free delivery",
+        marketShare: "Market Share",
+        ifoodShare: "Approximately 45% share of Brazil's food delivery market, ranking first in the industry",
+        userSatisfaction: "User Satisfaction",
+        n99food: "99food",
+        n99foodDesc: "Rapidly growing food delivery platform in Latin America",
+        tagGrowth: "Rapid Growth",
+        tagLatin: "Latin America Market",
+        tagFresh: "Fresh Food Delivery",
+        tagAffordable: "Affordable Prices",
+        n99Coverage: "Covers 8 Latin American countries including Brazil, Mexico and Argentina",
+        n99Users: "15 million registered users, with 65% annual growth rate",
+        n99Advantage: "Affordable prices, close cooperation with local supermarkets, leading in fresh food delivery",
+        n99News: "Completed $100 million in financing, planning to expand to European markets",
+        featureService: "Featured Services",
+        n99Service: "Launched \"99-minute delivery\" promise, automatic coupon compensation for delays",
+        doordash: "DoorDash",
+        doordashDesc: "Largest food delivery platform in the United States",
+        tagNorthAmerica: "North America Leader",
+        tagGlobal: "Global Expansion",
+        tagTech: "Technology Leader",
+        tagHighSatisfaction: "High Satisfaction",
+        ddCoverage: "Covers multiple countries including the United States, Canada and Australia, over 7,000 cities",
+        ddUsers: "32 million monthly active users, with over 390,000 partner merchants",
+        ddAdvantage: "Extensive delivery network, leading technology, comprehensive merchant services",
+        ddNews: "Launched express delivery service DashPass, with over 5 million subscribed users",
+        financialData: "Financial Data",
+        ddFinance: "2023 revenue exceeded $6.5 billion, up 25% year-on-year",
+        chartTitle: "Market Share Comparison of Three Platforms",
+        subscribeTitle: "Get the Latest Food Delivery News",
+        subscribeDesc: "Subscribe to our newsletter to get the latest food delivery industry news, promotions and competitor analysis",
+        emailPlaceholder: "Please enter your email address",
+        subscribeBtn: "Subscribe Now",
+        privacyNote: "We respect your privacy and will not share your information with third parties",
+        footerDesc: "Real-time integration of food delivery industry information to help you grasp market dynamics",
+        quickLinks: "Quick Links",
+        aboutUs: "About Us",
+        contactUs: "Contact Us",
+        resourceCenter: "Resource Center",
+        industryReport: "Industry Reports",
+        marketAnalysis: "Market Analysis",
+        operationGuide: "Operation Guide",
+        regulationInterpretation: "Regulation Interpretation",
+        dataDownload: "Data Download",
+        address: "Room 1001, Block A, Science and Technology Park, Chaoyang District, Beijing",
+        phone: "+86 10 8888 7777",
+        email: "info@waimaiinfo.com",
+        copyright: "&copy; 2023 Food Delivery Intelligence. All rights reserved | Beijing ICP No. 12345678"
+      },
+      pt: {
+        siteTitle: "Inteligência de Delivery",
+        navSummary: "Resumo de Informações",
+        navResources: "Sites de Recursos",
+        navCompetitors: "Análise de Concorrentes",
+        btnRefresh: "Atualização em Tempo Real",
+        heroTitle: "Informações de Delivery em Tempo Real<br>Plataforma Integrada",
+        heroDesc: "Agregue as últimas notícias de delivery, tendências do setor e análise de concorrentes para dominar o panorama do mercado",
+        btnExplore: "Explorar Informações",
+        btnNotify: "Configurar Lembretes",
+        statNews: "Notícias Diárias",
+        statResources: "Sites de Recursos",
+        statCompetitors: "Análise de Concorrentes",
+        statUpdate: "Atualização 24h",
+        summaryTitle: "Resumo de Informações",
+        summaryDesc: "Selecionadas as últimas tendências do setor de delivery, promoções e tendências de mercado para ajudá-lo a capturar rapidamente as informações essenciais",
+        tagMeituan: "Meituan",
+        tagEleme: "Ele.me",
+        tagIfood: "IFOOD",
+        tagDd: "DoorDash",
+        tagN99: "99food",
+        tagPlatform: "Marca da plataforma",
+        categoryPromo: "Atividades da Plataforma",
+        categoryIndustry: "Tendências do Setor",
+        categoryNew: "Novos Produtos",
+        categoryPolicy: "Políticas e Regulamentações",
+        categoryData: "Dados do Mercado",
+        categorySafety: "Segurança Alimentar",
+        categoryTech: "Inovação Tecnológica",
+        categoryFeedback: "Feedback do Usuário",
+        categoryCoop: "Notícias de Cooperação",
+        time2h: "Há 2 horas",
+        time5h: "Há 5 horas",
+        timeYesterday: "Ontem",
+        time2d: "Há 2 dias",
+        time3d: "Há 3 dias",
+        time4d: "Há 4 dias",
+        news1Title: "Festival de Comida de Verão lançado, múltiplas plataformas oferecem descontos",
+        news1Desc: "As principais plataformas de delivery lançaram promoções de verão simultaneamente, com descontos máximos de até 50 yuan, especialmente para churrasco e lagosta.",
+        news2Title: "Taxas de entrega aumentam conforme múltiplas plataformas ajustam preços",
+        news2Title: "Taxas de entrega aumentam conforme múltiplas plataformas ajustam preços",
+        news2Desc: "Afectadas pelo aumento do preço do combustível, várias plataformas ajustaram os métodos de cálculo das taxas de entrega, com pedidos de longa distância aumentando em média 15%-20%.",
+        news3Title: "Marca de café em cadeia lança novos produtos exclusivos para delivery com 30% de desconto",
+        news3Desc: "Uma conhecida marca de café lançou 3 novos produtos para canais de delivery, com 30% de desconto ao pedir pela plataforma, válido por uma semana.",
+        news4Title: "Novos regulamentos de embalagem de delivery implementados, exigindo 80% de embalagens ecológicas",
+        news4Desc: "As revisadas normas de proteção ambiental para embalagens de delivery foram oficialmente implementadas, exigindo que os comerciantes da plataforma usem pelo menos 80% de embalagens ecológicas.",
+        news5Title: "Relatório do mercado de delivery do Q2 lançado, com escala de usuários superior a 500 milhões",
+        news5Desc: "O último relatório trimestral mostra que o número de usuários de delivery chegou a 520 milhões, um aumento de 8,3% ano a ano, com mercados em expansão como principal motor de crescimento.",
+        news6Title: "Plataformas fortalecem auditorias de comerciantes, removendo mais de 2.000 restaurantes não conformes",
+        news6Desc: "Principais plataformas realizaram correção especial de segurança alimentar, removendo mais de 2.300 comerciantes com certificações incompletas ou má higiene, elevando a taxa de aprovação para 96%.",
+        news7Title: "Entrega autônoma expande cobertura, 3 cidades pilotam delivery por drone",
+        news7Desc: "Uma plataforma líder anunciou a expansão de serviços de entrega autônoma para 3 novas cidades piloto, com entrega por drone chegando aos destinos em apenas 15 minutos.",
+        news8Title: "Pesquisa de satisfação do usuário: tempo de entrega becomes principal preocupação",
+        news8Desc: "A última pesquisa de usuários mostra que 78% dos consumidores listam a pontualidade da entrega como o principal fator ao escolher uma plataforma de delivery, seguido pelo preço.",
+        news9Title: "Plataformas chegam a cooperação estratégica com redes de supermercados, reduzindo tempo de entrega de produtos frescos para 30 minutos",
+        news9Desc: "Duas grandes plataformas assinaram acordos de cooperação estratégica com principais redes de supermercados para otimizar redes de entrega de alimentos frescos, prometendo entrega em 30 minutos em áreas principais.",
+        readMore: "Ver detalhes",
+        loadMore: "Carregar mais",
+        resourcesTitle: "Recursos de Informação de Delivery",
+        resourcesDesc: "Sites de informação de delivery de qualidade selecionados, cobrindo notícias do setor, relatórios de dados e recursos comerciais",
+        linkTip: "Se o link não puder ser acessado diretamente, tente copiar o link para o seu navegador",
+        site1Title: "Notícias de Delivery",
+        site1Desc: "Últimas notícias e análises do setor de delivery",
+        site2Title: "Centro de Dados de Serviços Alimentares",
+        site2Desc: "Dados de mercado de delivery e relatórios estatísticos",
+        site3Title: "Negócio de Restaurante Online",
+        site3Desc: "Guias de gestão de restaurantes e estratégias de delivery",
+        site4Title: "Aliança de Entregadores",
+        site4Desc: "Informações do setor de entrega e comunidade de entregadores",
+        site5Title: "Notícias de Segurança Alimentar",
+        site5Desc: "Normas e regulamentações de segurança de delivery",
+        site6Title: "Relatórios de Serviços Alimentares Online",
+        site6Desc: "Relatórios de pesquisa aprofundados sobre o setor de delivery",
+        site7Title: "Conecte-se à Tecnologia Alimentar",
+        site7Desc: "Aplicações de tecnologia de delivery e tendências de inovação",
+        site8Title: "Rede de Marketing de Restaurantes",
+        site8Desc: "Estratégias de marketing de delivery e técnicas de promoção",
+        site9Title: "Informações Legais de Delivery",
+        site9Desc: "Regulamentações do setor de delivery e interpretações legais",
+        site10Title: "Fórum Global de Serviços Alimentares",
+        site10Desc: "Dinâmicas e trocas do mercado internacional de delivery",
+        visit: "Visitar",
+        competitorsTitle: "Análise de Concorrentes",
+        competitorsDesc: "Análise aprofundada das informações principais e dinâmicas de três grandes plataformas de delivery: IFOOD, 99food e DoorDash",
+        ifood: "IFOOD",
+        ifoodDesc: "Plataforma de delivery líder no Brasil",
+        tagLeader: "Líder do Mercado",
+        tagBrazil: "Mercado Brasileiro",
+        tagEfficient: "Alta Eficiência de Entrega",
+        tagLocal: "Serviço Localizado",
+        marketCoverage: "Cobertura de Mercado",
+        ifoodCoverage: "Cobre mais de 95% das cidades do Brasil com mais de 150.000 restaurantes parceiros",
+        userScale: "Escala de Usuários",
+        ifoodUsers: "Mais de 20 milhões de usuários registrados, com 12 milhões de usuários ativos mensais",
+        coreAdvantage: "Vantagens Principais",
+        ifoodAdvantage: "Serviços localizados completos, métodos de pagamento diversificados, alta eficiência de entrega",
+        latestNews: "Últimas Notícias",
+        ifoodNews: "Lançado serviço de assinatura, R$9,9 por mês para entrega gratuita",
+        marketShare: "Participação de Mercado",
+        ifoodShare: "Aproximadamente 45% da participação no mercado de delivery do Brasil, ocupando o primeiro lugar no setor",
+        userSatisfaction: "Satisfação do Usuário",
+        n99food: "99food",
+        n99foodDesc: "Plataforma de delivery em rápido crescimento na América Latina",
+        tagGrowth: "Crescimento Rápido",
+        tagLatin: "Mercado da América Latina",
+        tagFresh: "Entrega de Produtos Frescos",
+        tagAffordable: "Preços Acessíveis",
+        n99Coverage: "Cobre 8 países da América Latina, incluindo Brasil, México e Argentina",
+        n99Users: "15 milhões de usuários registrados, com taxa de crescimento anual de 65%",
+        n99Advantage: "Preços acessíveis, estreita cooperação com supermercados locais, líder em entrega de alimentos frescos",
+        n99News: "Concluiu US$100 milhões em financiamento, planejando expandir para mercados europeus",
+        featureService: "Serviços Destacados",
+        n99Service: "Lançou a promessa de \"entrega em 99 minutos\", com compensação automática de cupons por atrasos",
+        doordash: "DoorDash",
+        doordashDesc: "Maior plataforma de delivery dos Estados Unidos",
+        tagNorthAmerica: "Líder da América do Norte",
+        tagGlobal: "Expansão Global",
+        tagTech: "Líder em Tecnologia",
+        tagHighSatisfaction: "Alta Satisfação",
+        ddCoverage: "Cobre vários países, incluindo Estados Unidos, Canadá e Austrália, mais de 7.000 cidades",
+        ddUsers: "32 milhões de usuários ativos mensais, com mais de 390.000 comerciantes parceiros",
+        ddAdvantage: "Extensa rede de entrega, tecnologia líder, serviços comerciais completos",
+        ddNews: "Lançou serviço de entrega expressa DashPass, com mais de 5 milhões de usuários assinantes",
+        financialData: "Dados Financeiros",
+        ddFinance: "Receita de 2023 excedeu US$6,5 bilhões, com aumento de 25% ano a ano",
+        chartTitle: "Comparação de Participação de Mercado de Três Plataformas",
+        subscribeTitle: "Obtenha as Últimas Notícias de Delivery",
+        subscribeDesc: "Assine nosso boletim para receber as últimas notícias do setor de delivery, promoções e análise de concorrentes",
+        emailPlaceholder: "Por favor, insira seu endereço de e-mail",
+        subscribeBtn: "Assinar Agora",
+        privacyNote: "Respeitamos sua privacidade e não compartilharemos suas informações com terceiros",
+        footerDesc: "Integração em tempo real de informações do setor de delivery para ajudá-lo a dominar a dinâmica do mercado",
+        quickLinks: "Links Rápidos",
+        aboutUs: "Sobre Nós",
+        contactUs: "Contate-Nos",
+        resourceCenter: "Centro de Recursos",
+        industryReport: "Relatórios do Setor",
+        marketAnalysis: "Análise de Mercado",
+        operationGuide: "Guia de Operação",
+        regulationInterpretation: "Interpretação de Regulamentações",
+        dataDownload: "Download de Dados",
+        address: "Sala 1001, Bloco A, Parque de Ciência e Tecnologia, Distrito de Chaoyang, Pequim",
+        phone: "+86 10 8888 7777",
+        email: "info@waimaiinfo.com",
+        copyright: "&copy; 2023 Inteligência de Delivery. Todos os direitos reservados | ICP de Pequim nº 12345678"
+      }
+    };
+
+    // 语言切换功能
+    document.querySelectorAll('.language-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const lang = this.getAttribute('data-lang');
+        changeLanguage(lang);
+        
+        // 更新按钮样式
+        document.querySelectorAll('.language-btn').forEach(b => {
+          b.classList.remove('bg-primary/10', 'text-primary');
+        });
+        this.classList.add('bg-primary/10', 'text-primary');
+      });
+    });
+
+    function changeLanguage(lang) {
+      // 更新文本内容
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+          el.textContent = translations[lang][key];
+        }
+      });
+      
+      // 更新占位符
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (translations[lang] && translations[lang][key]) {
+          el.placeholder = translations[lang][key];
+        }
+      });
+      
+      // 更新图表标签
+      updateChartLanguage(lang);
+    }
+
+    // 初始化默认语言
+    document.addEventListener('DOMContentLoaded', () => {
+      // 默认中文
+      document.querySelector('.language-btn[data-lang="zh"]').classList.add('bg-primary/10', 'text-primary');
+      updateChartLanguage('zh');
+    });
+
+    // 移动端菜单切换
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    menuToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+    
+    // 导航栏滚动效果
+    const navbar = document.getElementById('navbar');
+    
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add('py-2', 'shadow');
+        navbar.classList.remove('py-3', 'shadow-sm');
+      } else {
+        navbar.classList.add('py-3', 'shadow-sm');
+        navbar.classList.remove('py-2', 'shadow');
+      }
+    });
+    
+    // 返回顶部按钮
+    const backToTopButton = document.getElementById('backToTop');
+    
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        backToTopButton.classList.remove('opacity-0', 'invisible');
+        backToTopButton.classList.add('opacity-100', 'visible');
+      } else {
+        backToTopButton.classList.add('opacity-0', 'invisible');
+        backToTopButton.classList.remove('opacity-100', 'visible');
+      }
+    });
+    
+    backToTopButton.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+    
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: 'smooth'
+          });
+          
+          // 关闭移动菜单
+          if (!mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+          }
+        }
+      });
+    });
+    
+    // 市场份额图表 - 支持多语言
+    let marketShareChart;
+    
+    function updateChartLanguage(lang) {
+      const ctx = document.getElementById('marketShareChart').getContext('2d');
+      
+      // 图表标签翻译
+      const labels = {
+        zh: ['美国市场', '巴西市场', '拉美市场', '全球市场'],
+        en: ['US Market', 'Brazil Market', 'Latin America Market', 'Global Market'],
+        pt: ['Mercado EUA', 'Mercado Brasileiro', 'Mercado da América Latina', 'Mercado Global']
+      };
+      
+      const yTitle = {
+        zh: '市场份额 (%)',
+        en: 'Market Share (%)',
+        pt: 'Participação de Mercado (%)'
+      };
+      
+      // 销毁现有图表
+      if (marketShareChart) {
+        marketShareChart.destroy();
+      }
+      
+      // 创建新图表
+      marketShareChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels[lang],
+          datasets: [
+            {
+              label: 'DoorDash',
+              data: [55, 10, 15, 28],
+              backgroundColor: '#FF9800',
+              borderRadius: 6
+            },
+            {
+              label: 'IFOOD',
+              data: [5, 45, 25, 15],
+              backgroundColor: '#F44336',
+              borderRadius: 6
+            },
+            {
+              label: '99food',
+              data: [3, 20, 30, 12],
+              backgroundColor: '#36B37E',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            duration: 1500,
+            easing: 'easeOutQuart'
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.dataset.label + ': ' + context.raw + '%';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return value + '%';
+                }
+              },
+              title: {
+                display: true,
+                text: yTitle[lang]
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    // 信息卡片加载动画
+    document.addEventListener('DOMContentLoaded', () => {
+      const cards = document.querySelectorAll('.card-hover');
+      cards.forEach((card, index) => {
+        // 初始隐藏状态
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 100 * index);
+      });
+    });
+    
+    // 链接复制功能
+    function copyLink(url) {
+      navigator.clipboard
