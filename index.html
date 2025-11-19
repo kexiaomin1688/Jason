@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 全球外卖行业洞察 | Global Food Delivery Insights</title>
+    <meta name="description" content="聚合多平台外卖资讯、行业动态及竞争分析平台。">
+    <meta name="keywords" content="外卖, 美团, 饿了么, iFood, DoorDash, 行业分析, 数据报告, 2025趋势">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0066CC', // Professional Blue
+                        secondary: '#FF9900', // Energetic Orange (common in food delivery)
+                        dark: '#1A202C',
+                        light: '#F7FAFC',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans SC', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Loading Animation */
+        .spin-slow {
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <!-- Navigation -->
+    <header id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-transparent py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white mr-3 shadow-lg">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-gray-900" data-i18n="siteTitle">外卖洞察 2025</span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#news" class="text-gray-600 hover:text-primary font-medium transition" data-i18n="navNews">行业资讯</a>
+                    <a href="#resources" class="text-gray-600 hover:text-primary font-medium transition" data-i18n="navResources">资源导航</a>
+                    <a href="#analysis" class="text-gray-600 hover:text-primary font-medium transition" data-i18n="navAnalysis">竞争分析</a>
+                    
+                    <!-- Language Switcher -->
+                    <div class="relative group">
+                        <button class="flex items-center text-gray-600 hover:text-primary font-medium focus:outline-none">
+                            <i class="fas fa-globe mr-2"></i>
+                            <span id="currentLangLabel">中文</span>
+                            <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right z-50">
+                            <div class="py-1">
+                                <a href="#" onclick="changeLanguage('cn')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary">中文</a>
+                                <a href="#" onclick="changeLanguage('en')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary">English</a>
+                                <a href="#" onclick="changeLanguage('pt')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary">Português</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" class="text-gray-600 hover:text-primary focus:outline-none p-2">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white shadow-lg absolute w-full border-t border-gray-100">
+            <div class="px-4 pt-2 pb-4 space-y-1">
+                <a href="#news" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50" data-i18n="navNews">行业资讯</a>
+                <a href="#resources" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50" data-i18n="navResources">资源导航</a>
+                <a href="#analysis" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50" data-i18n="navAnalysis">竞争分析</a>
+                <div class="border-t border-gray-200 my-2"></div>
+                <div class="flex justify-around py-2">
+                    <button onclick="changeLanguage('cn')" class="px-3 py-1 text-sm rounded border hover:bg-gray-50">CN</button>
+                    <button onclick="changeLanguage('en')" class="px-3 py-1 text-sm rounded border hover:bg-gray-50">EN</button>
+                    <button onclick="changeLanguage('pt')" class="px-3 py-1 text-sm rounded border hover:bg-gray-50">PT</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-12 bg-gradient-to-b from-blue-50 to-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="inline-block bg-blue-100 text-primary px-3 py-1 rounded-full text-xs font-semibold mb-4 animate-pulse">
+                2025 年最新数据已更新 | Data Updated 2025
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight animate-fade-in-up">
+                <span class="text-primary" data-i18n="heroTitlePrefix">全球外卖</span> 
+                <span data-i18n="heroTitleSuffix">行业情报中心</span>
+            </h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8" data-i18n="heroSubtitle">
+                聚合多平台外卖资讯、深度行业动态及实时竞争分析。
+            </p>
+            <div class="flex justify-center gap-4">
+                <a href="#news" class="bg-primary text-white px-8 py-3 rounded-full font-medium shadow-lg hover:bg-blue-700 transition transform hover:scale-105" data-i18n="btnStart">
+                    浏览资讯
+                </a>
+                <a href="#subscribe" class="bg-white text-primary border border-gray-200 px-8 py-3 rounded-full font-medium shadow-sm hover:bg-gray-50 transition transform hover:scale-105" data-i18n="btnSubscribe">
+                    订阅周报
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Section -->
+    <section id="news" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-12">
+                <div class="text-center md:text-left mb-6 md:mb-0">
+                    <h2 class="text-3xl font-bold text-gray-900" data-i18n="newsTitle">平台动态追踪</h2>
+                    <div class="w-20 h-1 bg-secondary mt-2 rounded-full md:mx-0 mx-auto"></div>
+                </div>
+                <button onclick="refreshNewsData()" class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition">
+                    <i class="fas fa-sync-alt" id="refreshIcon"></i>
+                    <span data-i18n="btnRealTime">实时更新数据</span>
+                </button>
+            </div>
+
+            <!-- Platform Tabs -->
+            <div class="flex flex-wrap justify-center md:justify-start gap-2 mb-10">
+                <button onclick="filterNews('all')" id="tab-all" class="platform-tab active bg-gray-800 text-white px-5 py-2 rounded-full text-sm font-medium transition shadow-md">All</button>
+                <button onclick="filterNews('Meituan')" id="tab-Meituan" class="platform-tab bg-white text-gray-600 hover:bg-gray-100 px-5 py-2 rounded-full text-sm font-medium transition border border-gray-200">Meituan</button>
+                <button onclick="filterNews('Eleme')" id="tab-Eleme" class="platform-tab bg-white text-gray-600 hover:bg-gray-100 px-5 py-2 rounded-full text-sm font-medium transition border border-gray-200">Ele.me</button>
+                <button onclick="filterNews('iFood')" id="tab-iFood" class="platform-tab bg-white text-gray-600 hover:bg-gray-100 px-5 py-2 rounded-full text-sm font-medium transition border border-gray-200">iFood</button>
+                <button onclick="filterNews('DoorDash')" id="tab-DoorDash" class="platform-tab bg-white text-gray-600 hover:bg-gray-100 px-5 py-2 rounded-full text-sm font-medium transition border border-gray-200">DoorDash</button>
+                <button onclick="filterNews('99food')" id="tab-99food" class="platform-tab bg-white text-gray-600 hover:bg-gray-100 px-5 py-2 rounded-full text-sm font-medium transition border border-gray-200">99food</button>
+            </div>
+
+            <!-- News Grid -->
+            <div id="newsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[400px]">
+                <!-- Content populated by JS -->
+            </div>
+
+            <!-- Copy Summary Box -->
+            <div class="mt-16 bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white opacity-5 rounded-full"></div>
+                <div class="relative z-10">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                        <div>
+                            <h3 class="text-2xl font-bold text-white mb-2" data-i18n="summaryTitle">每日外卖简报 (2025)</h3>
+                            <p class="text-gray-400 text-sm" data-i18n="summaryDesc">汇总 10+ 条最新核心动态，带时间戳，一键复制</p>
+                        </div>
+                        <button onclick="copySummary()" class="mt-4 md:mt-0 bg-secondary hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition flex items-center gap-2">
+                            <i class="fas fa-copy"></i>
+                            <span data-i18n="btnCopy">复制全部内容</span>
+                        </button>
+                    </div>
+                    <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-700 h-64 overflow-y-auto text-gray-300 font-mono text-sm leading-relaxed" id="summaryPreview">
+                        <!-- Summary populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section id="resources" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between mb-10">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900" data-i18n="resourceTitle">行业资源导航</h2>
+                    <p class="text-sm text-gray-500 mt-1">严选高价值数据源与信息网站</p>
+                </div>
+                <a href="#" class="text-primary hover:underline text-sm" data-i18n="viewMore">查看更多</a>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="resourceGrid">
+                <!-- Resources populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Analysis Section -->
+    <section id="analysis" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900" data-i18n="analysisTitle">全球竞争格局分析</h2>
+                <p class="text-gray-500 mt-2" data-i18n="analysisSubtitle">2025 关键市场核心数据对比</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Chart Card -->
+                <div class="lg:col-span-1 bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4" data-i18n="marketShareTitle">市场份额分布 (巴西 2025)</h3>
+                    <div class="relative h-64 w-full">
+                        <canvas id="marketChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center text-xs text-gray-400">Data Source: Internal Est. 2025 Q1</div>
+                </div>
+
+                <!-- Comparison Cards -->
+                <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- iFood Analysis -->
+                    <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-red-500 card-hover">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-xl font-bold text-gray-800">iFood</h4>
+                            <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Leader</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600" data-i18n="metricCoverage">市场覆盖</span>
+                                    <span class="font-bold">94%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-red-500 h-2 rounded-full" style="width: 94%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600" data-i18n="metricSpeed">配送速度</span>
+                                    <span class="font-bold">8.8/10</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-red-500 h-2 rounded-full" style="width: 88%"></div>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 border-t pt-2" data-i18n="ifoodAdvantage">优势：2025 年完成无人车试点，本地网络不可撼动。</p>
+                        </div>
+                    </div>
+
+                    <!-- DoorDash Analysis -->
+                    <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-red-600 card-hover">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-xl font-bold text-gray-800">DoorDash</h4>
+                            <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded">Global Giant</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600" data-i18n="metricCoverage">市场覆盖</span>
+                                    <span class="font-bold">68%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-red-600 h-2 rounded-full" style="width: 68%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600" data-i18n="metricSpeed">配送速度</span>
+                                    <span class="font-bold">9.2/10</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-red-600 h-2 rounded-full" style="width: 92%"></div>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 border-t pt-2" data-i18n="doordashAdvantage">优势：并购扩张南美版图，AI 调度系统升级。</p>
+                        </div>
+                    </div>
+
+                    <!-- 99food Analysis -->
+                    <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-400 card-hover">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-xl font-bold text-gray-800">99Food</h4>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Challenger</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600" data-i18n="metricCoverage">市场覆盖</span>
+                                    <span class="font-bold">42%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-yellow-400 h-2 rounded-full" style="width: 42%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600" data-i18n="metricSpeed">配送速度</span>
+                                    <span class="font-bold">7.8/10</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-yellow-400 h-2 rounded-full" style="width: 78%"></div>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 border-t pt-2" data-i18n="ninetynineAdvantage">优势：依托网约车运力，2025 主打低价拼团策略。</p>
+                        </div>
+                    </div>
+                    
+                     <!-- Meituan Analysis -->
+                     <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500 card-hover">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-xl font-bold text-gray-800">Meituan</h4>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Super App</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600" data-i18n="metricCoverage">市场覆盖</span>
+                                    <span class="font-bold">96% (CN)</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 96%"></div>
+                                </div>
+                            </div>
+                             <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600" data-i18n="metricSpeed">配送速度</span>
+                                    <span class="font-bold">9.9/10</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 99%"></div>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 border-t pt-2" data-i18n="meituanAdvantage">优势：第四代无人机大规模商用，万物到家生态闭环。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Subscribe Section -->
+    <section id="subscribe" class="bg-dark py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-2xl md:text-3xl font-bold text-white mb-4" data-i18n="subTitle">不错过 2025 行业动态</h2>
+            <p class="text-gray-400 mb-8" data-i18n="subDesc">加入超过 15,000 名行业从业者的行列，每周获取深度分析报告。</p>
+            <form class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto" onsubmit="event.preventDefault(); showToast('订阅成功！Subscribed!', 'success')">
+                <input type="email" placeholder="your@email.com" class="flex-1 px-6 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-gray-800 text-white border border-gray-700" required>
+                <button type="submit" class="bg-primary hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold transition" data-i18n="btnSubscribeShort">订阅</button>
+            </form>
+            <p class="text-gray-600 text-xs mt-4" data-i18n="privacyNote">我们尊重您的隐私，绝不发送垃圾邮件。</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-utensils text-primary text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-white">外卖洞察 2025</span>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4 max-w-sm">
+                        专注全球外卖市场数据分析与资讯整合，为商家、投资者和研究人员提供决策支持。
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">快速链接</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#news" class="hover:text-primary transition">行业资讯</a></li>
+                        <li><a href="#analysis" class="hover:text-primary transition">竞争分析</a></li>
+                        <li><a href="#resources" class="hover:text-primary transition">资源中心</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">联系我们</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center"><i class="fas fa-envelope w-5 text-gray-500"></i> contact@foodinsights.com</li>
+                        <li class="flex items-center"><i class="fas fa-map-marker-alt w-5 text-gray-500"></i> São Paulo, Brazil</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-sm text-gray-500">
+                &copy; 2025 Global Food Delivery Insights. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 z-50 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3">
+        <i class="fas fa-check-circle text-green-400"></i>
+        <span id="toastMsg">Operation Successful</span>
+    </div>
+
+    <!-- Back to Top -->
+    <button id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-5 right-5 bg-primary text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center transform translate-y-20 transition-all duration-300 hover:bg-blue-600 z-40">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- State & Data ---
+        let currentLang = 'cn';
+        let myChart = null;
+
+        const translations = {
+            cn: {
+                siteTitle: "外卖洞察 2025",
+                navNews: "行业资讯",
+                navResources: "资源导航",
+                navAnalysis: "竞争分析",
+                heroTitlePrefix: "全球外卖",
+                heroTitleSuffix: "行业情报中心",
+                heroSubtitle: "聚合多平台外卖资讯、深度行业动态及实时竞争分析。",
+                btnStart: "浏览资讯",
+                btnSubscribe: "订阅周报",
+                newsTitle: "平台动态追踪",
+                summaryTitle: "每日外卖简报 (2025)",
+                summaryDesc: "汇总 10+ 条最新核心动态，带时间戳，一键复制",
+                btnCopy: "复制全部内容",
+                resourceTitle: "行业资源导航",
+                viewMore: "查看更多",
+                analysisTitle: "全球竞争格局分析",
+                analysisSubtitle: "2025 关键市场核心数据对比",
+                marketShareTitle: "市场份额分布 (巴西 2025)",
+                metricCoverage: "市场覆盖",
+                metricSpeed: "配送速度",
+                subTitle: "不错过 2025 行业动态",
+                subDesc: "加入超过 15,000 名行业从业者的行列，每周获取深度分析报告。",
+                btnSubscribeShort: "订阅",
+                privacyNote: "我们尊重您的隐私，绝不发送垃圾邮件。",
+                ifoodAdvantage: "优势：2025 年完成无人车试点，本地网络不可撼动。",
+                doordashAdvantage: "优势：并购扩张南美版图，AI 调度系统升级。",
+                ninetynineAdvantage: "优势：依托网约车运力，2025 主打低价拼团策略。",
+                meituanAdvantage: "优势：第四代无人机大规模商用，万物到家生态闭环。",
+                copySuccess: "已复制到剪贴板！",
+                copyFail: "复制失败，请重试。",
+                btnRealTime: "实时更新数据",
+                platforms: {
+                    Meituan: "美团",
+                    Eleme: "饿了么"
+                }
+            },
+            en: {
+                siteTitle: "Delivery Insights 2025",
+                navNews: "News",
+                navResources: "Resources",
+                navAnalysis: "Analysis",
+                heroTitlePrefix: "Global Food",
+                heroTitleSuffix: "Delivery Intelligence",
+                heroSubtitle: "Aggregating multi-platform news, industry trends, and real-time competitive analysis.",
+                btnStart: "Explore News",
+                btnSubscribe: "Subscribe",
+                newsTitle: "Platform Tracker",
+                summaryTitle: "Daily Digest 2025",
+                summaryDesc: "Summary of 10+ latest dynamics with timestamps, one-click copy.",
+                btnCopy: "Copy All",
+                resourceTitle: "Industry Resources",
+                viewMore: "View More",
+                analysisTitle: "Competitive Landscape",
+                analysisSubtitle: "Core data comparison for key markets in 2025",
+                marketShareTitle: "Market Share (Brazil 2025)",
+                metricCoverage: "Coverage",
+                metricSpeed: "Speed",
+                subTitle: "Stay Updated",
+                subDesc: "Join over 15,000 industry professionals receiving our weekly reports.",
+                btnSubscribeShort: "Subscribe",
+                privacyNote: "We respect your privacy. No spam.",
+                ifoodAdvantage: "Pro: 2025 autonomous pilot complete, unshakable local network.",
+                doordashAdvantage: "Pro: Expanding SA footprint via M&A, AI dispatch upgrade.",
+                ninetynineAdvantage: "Pro: Leverages ride-hailing fleet, 2025 low-cost group buying strategy.",
+                meituanAdvantage: "Pro: Gen4 drone mass commercialization, everything-to-door.",
+                copySuccess: "Copied to clipboard!",
+                copyFail: "Copy failed, please try again.",
+                btnRealTime: "Update Data",
+                platforms: {
+                    Meituan: "Meituan",
+                    Eleme: "Ele.me"
+                }
+            },
+            pt: {
+                siteTitle: "Delivery Insights 2025",
+                navNews: "Notícias",
+                navResources: "Recursos",
+                navAnalysis: "Análise",
+                heroTitlePrefix: "Inteligência",
+                heroTitleSuffix: "Delivery Global",
+                heroSubtitle: "Agregando notícias multiplataforma, tendências e análise competitiva em tempo real.",
+                btnStart: "Explorar",
+                btnSubscribe: "Inscrever-se",
+                newsTitle: "Rastreador de Plataformas",
+                summaryTitle: "Resumo Diário 2025",
+                summaryDesc: "Resumo das últimas dinâmicas com horário, cópia com um clique.",
+                btnCopy: "Copiar Tudo",
+                resourceTitle: "Recursos da Indústria",
+                viewMore: "Ver Mais",
+                analysisTitle: "Cenário Competitivo",
+                analysisSubtitle: "Comparação de dados para mercados-chave em 2025",
+                marketShareTitle: "Participação de Mercado (Brasil 2025)",
+                metricCoverage: "Cobertura",
+                metricSpeed: "Velocidade",
+                subTitle: "Mantenha-se Atualizado",
+                subDesc: "Junte-se a mais de 15.000 profissionais recebendo nossos relatórios.",
+                btnSubscribeShort: "Inscrever",
+                privacyNote: "Respeitamos sua privacidade. Sem spam.",
+                ifoodAdvantage: "Vantagem: Piloto autônomo completo em 2025, rede local inabalável.",
+                doordashAdvantage: "Vantagem: Expansão SA via M&A, atualização despacho IA.",
+                ninetynineAdvantage: "Vantagem: Frota de transporte, estratégia de compras em grupo 2025.",
+                meituanAdvantage: "Vantagem: Comercialização em massa drone Gen4, tudo-na-porta.",
+                copySuccess: "Copiado para a área de transferência!",
+                copyFail: "Falha ao copiar.",
+                btnRealTime: "Atualizar Dados",
+                platforms: {
+                    Meituan: "Meituan",
+                    Eleme: "Ele.me"
+                }
+            }
+        };
+
+        // Updated 2025 Mock Data - Expanded to 12 Items
+        const newsItems = [
+            { id: 1, platform: 'Meituan', time: '10:30', date: '2025-03-15', url: 'https://www.meituan.com', source: 'Meituan IR', title_cn: '美团第四代无人机获准在上海全域常态化运营，日均单量突破 50 万', title_en: 'Meituan Gen4 drones approved for full Shanghai operation, 500k daily orders', title_pt: 'Drones Gen4 da Meituan aprovados para operação total em Xangai', tag: 'Innovation' },
+            { id: 2, platform: 'iFood', time: '09:45', date: '2025-03-14', url: 'https://institutional.ifood.com.br/en/', source: 'Bloomberg', title_cn: 'iFood 2024年报：巴西市场份额升至 82%，宣布进军金融科技领域', title_en: 'iFood 2024 Report: Brazil share hits 82%, announces fintech expansion', title_pt: 'Relatório iFood 2024: Participação no Brasil atinge 82%, expansão fintech', tag: 'Finance' },
+            { id: 3, platform: 'DoorDash', time: '09:15', date: '2025-03-14', url: 'https://ir.doordash.com/', source: 'TechCrunch', title_cn: 'DoorDash 完成对南非主要配送平台的收购，全球化战略加速', title_en: 'DoorDash completes acquisition of major SA delivery platform', title_pt: 'DoorDash conclui aquisição de grande plataforma de entrega na AS', tag: 'Expansion' },
+            { id: 4, platform: 'Eleme', time: '08:50', date: '2025-03-13', url: 'https://www.ele.me', source: '36Kr', title_cn: '饿了么发布 "AI 猜你喜欢" 3.0，转化率提升 15%', title_en: 'Ele.me releases "AI Recommendations" 3.0, conversion up 15%', title_pt: 'Ele.me lança "Recomendações IA" 3.0, conversão aumenta 15%', tag: 'Tech' },
+            { id: 5, platform: '99food', time: '08:30', date: '2025-03-13', url: 'https://99app.com/', source: 'Valor', title_cn: '99food 推出"拼团午餐"功能，主打高性价比白领市场', title_en: '99food launches "Group Lunch" targeting cost-conscious office workers', title_pt: '99food lança "Almoço em Grupo" para trabalhadores de escritório', tag: 'Product' },
+            { id: 6, platform: 'Meituan', time: '14:20', date: '2025-03-12', url: 'https://www.meituan.com', source: 'Caixin', title_cn: 'Keeta (美团海外版) 在中东地区日单量超越主要竞争对手', title_en: 'Keeta (Meituan Global) surpasses rivals in Middle East daily orders', title_pt: 'Keeta (Meituan Global) supera rivais em pedidos diários no Oriente Médio', tag: 'Global' },
+            { id: 7, platform: 'Uber Eats', time: '11:00', date: '2025-03-12', url: 'https://www.ubereats.com', source: 'Reuters', title_cn: 'Uber Eats 宣布与特斯拉达成自动驾驶配送全球合作伙伴关系', title_en: 'Uber Eats announces global autonomous delivery partnership with Tesla', title_pt: 'Uber Eats anuncia parceria global de entrega autônoma com Tesla', tag: 'Partnership' },
+            { id: 8, platform: 'Rappi', time: '10:15', date: '2025-03-11', url: 'https://about.rappi.com/', source: 'LatamTech', title_cn: 'Rappi 获得软银追加投资 5 亿美元，巩固拉美超级应用地位', title_en: 'Rappi secures $500M add-on from SoftBank for Super App dominance', title_pt: 'Rappi garante US$ 500 milhões adicionais do SoftBank', tag: 'Investment' },
+            { id: 9, platform: 'GrabFood', time: '09:30', date: '2025-03-11', url: 'https://www.grab.com', source: 'Nikkei Asia', title_cn: 'GrabFood 东南亚新战略：整合杂货与药店配送', title_en: 'GrabFood SEA Strategy: Integrating grocery and pharmacy delivery', title_pt: 'Estratégia GrabFood SEA: Integrando entrega de farmácia e mercado', tag: 'Strategy' },
+            { id: 10, platform: 'Deliveroo', time: '16:45', date: '2025-03-10', url: 'https://deliveroo.co.uk', source: 'FT', title_cn: 'Deliveroo 英国市场实现全面盈利，股价大涨 12%', title_en: 'Deliveroo hits full profitability in UK, shares jump 12%', title_pt: 'Deliveroo atinge lucratividade total no Reino Unido, ações sobem 12%', tag: 'Stock' },
+            { id: 11, platform: 'Eleme', time: '13:10', date: '2025-03-10', url: 'https://www.ele.me', source: 'Sina Tech', title_cn: '饿了么联合 500 家连锁品牌推出 "低碳饮食" 认证计划', title_en: 'Ele.me launches "Low Carbon Diet" certification with 500 brands', title_pt: 'Ele.me lança certificação "Dieta Baixo Carbono" com 500 marcas', tag: 'ESG' },
+            { id: 12, platform: 'iFood', time: '11:20', date: '2025-03-09', url: 'https://institutional.ifood.com.br/', source: 'Exame', title_cn: 'iFood 利用 AI 预测需求，将食物浪费减少 30%', title_en: 'iFood cuts food waste by 30% using AI demand prediction', title_pt: 'iFood reduz desperdício de alimentos em 30% usando previsão de IA', tag: 'Sustainability' }
+        ];
+
+        const resources = [
+            { name: "36Kr Food", desc_cn: "36氪 - 权威科技创投媒体", desc_en: "36Kr - Tech & VC Media", desc_pt: "36Kr - Mídia de Tecnologia e VC", url: "https://36kr.com/information/web_news", icon: "fa-newspaper" },
+            { name: "Bloomberg Tech", desc_cn: "彭博社科技版 - 全球财经", desc_en: "Bloomberg Technology", desc_pt: "Bloomberg Tecnologia", url: "https://www.bloomberg.com/technology", icon: "fa-chart-line" },
+            { name: "LatePost", desc_cn: "晚点 LatePost - 深度商业报道", desc_en: "LatePost - Deep Business Reporting", desc_pt: "LatePost - Reportagem de Negócios", url: "https://www.latepost.com/", icon: "fa-pen-fancy" },
+            { name: "TechCrunch", desc_cn: "硅谷前沿科技新闻", desc_en: "Startup and Technology News", desc_pt: "Notícias de Startups e Tecnologia", url: "https://techcrunch.com/", icon: "fa-laptop-code" },
+            { name: "Meituan Institute", desc_cn: "美团研究院 - 官方行业数据", desc_en: "Meituan Research Institute", desc_pt: "Instituto de Pesquisa Meituan", url: "https://www.meituan.com/", icon: "fa-book" },
+            { name: "Statista", desc_cn: "全球统计数据库", desc_en: "Global Statistics Database", desc_pt: "Banco de Dados de Estatísticas", url: "https://www.statista.com/", icon: "fa-database" },
+        ];
+
+        // --- Core Functions ---
+
+        function init() {
+            renderNews('all');
+            renderResources();
+            updateSummary();
+            initChart();
+            
+            // Scroll listener for Navbar
+            window.addEventListener('scroll', () => {
+                const nav = document.getElementById('navbar');
+                const backBtn = document.getElementById('backToTop');
+                
+                if (window.scrollY > 50) {
+                    nav.classList.remove('bg-transparent', 'py-4');
+                    nav.classList.add('bg-white', 'shadow-md', 'py-2');
+                    
+                    // Show Back to top
+                    backBtn.classList.remove('translate-y-20');
+                    backBtn.classList.add('translate-y-0');
+                } else {
+                    nav.classList.add('bg-transparent', 'py-4');
+                    nav.classList.remove('bg-white', 'shadow-md', 'py-2');
+                    
+                    // Hide Back to top
+                    backBtn.classList.add('translate-y-20');
+                    backBtn.classList.remove('translate-y-0');
+                }
+            });
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('currentLangLabel').innerText = lang === 'cn' ? '中文' : (lang === 'en' ? 'EN' : 'PT');
+            
+            // Update DOM Text
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerText = translations[lang][key];
+                }
+            });
+
+            // Re-render Dynamic Content
+            renderNews(document.querySelector('.platform-tab.active').innerText === 'All' ? 'all' : document.querySelector('.platform-tab.active').innerText.trim());
+            renderResources();
+            updateSummary();
+            updateChart();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // --- News Logic ---
+
+        function filterNews(platform) {
+            // Update Tab Styles
+            document.querySelectorAll('.platform-tab').forEach(btn => {
+                btn.classList.remove('bg-gray-800', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-600', 'border');
+            });
+            
+            const activeBtn = document.getElementById(`tab-${platform}`);
+            if(activeBtn) {
+                activeBtn.classList.remove('bg-white', 'text-gray-600', 'border');
+                activeBtn.classList.add('bg-gray-800', 'text-white');
+            }
+
+            renderNews(platform);
+        }
+
+        function renderNews(filter) {
+            const grid = document.getElementById('newsGrid');
+            grid.innerHTML = '';
+
+            const filtered = filter === 'all' ? newsItems : newsItems.filter(item => item.platform === filter);
+
+            if (filtered.length === 0) {
+                 grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400">No updates for this platform yet.</div>`;
+                 return;
+            }
+
+            filtered.forEach((item, index) => {
+                const title = item[`title_${currentLang}`] || item.title_en;
+                const html = `
+                    <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm card-hover animate-fade-in flex flex-col h-full" style="animation-delay: ${index * 50}ms">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-blue-50 text-primary text-xs font-bold px-2 py-1 rounded uppercase tracking-wide">${item.platform}</span>
+                            <div class="text-right">
+                                <span class="block text-gray-400 text-xs font-mono">${item.date}</span>
+                                <span class="block text-gray-300 text-[10px] font-mono">${item.time}</span>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2 leading-snug">${title}</h3>
+                        <div class="mt-auto pt-4 border-t border-gray-50">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Source: ${item.source}</span>
+                                <span class="text-xs text-primary font-semibold"><i class="fas fa-tag mr-1"></i> ${item.tag}</span>
+                            </div>
+                            <a href="${item.url}" target="_blank" class="block w-full text-center bg-white border border-primary text-primary hover:bg-primary hover:text-white py-2 rounded-lg text-sm font-medium transition">
+                                Read Article <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += html;
+            });
+        }
+        
+        function refreshNewsData() {
+            const btn = document.querySelector('button[onclick="refreshNewsData()"]');
+            const icon = document.getElementById('refreshIcon');
+            const grid = document.getElementById('newsGrid');
+            
+            // UI Feedback
+            icon.classList.add('spin-slow');
+            btn.disabled = true;
+            btn.classList.add('opacity-75');
+            
+            // Simulate API Call latency
+            setTimeout(() => {
+                // Shuffle logic to simulate "new" sorting or updates
+                newsItems.sort(() => Math.random() - 0.5);
+                
+                // Refresh UI
+                const activeTab = document.querySelector('.platform-tab.active').innerText.trim();
+                renderNews(activeTab === 'All' ? 'all' : activeTab);
+                updateSummary();
+                
+                showToast(currentLang === 'cn' ? '数据已更新至最新！' : 'Data Updated Successfully!', 'success');
+                
+                // Reset UI
+                icon.classList.remove('spin-slow');
+                btn.disabled = false;
+                btn.classList.remove('opacity-75');
+            }, 1200);
+        }
+
+        function getNewsDesc(tag, lang) {
+            // Helper deprecated as we now show source/buttons directly
+            return ""; 
+        }
+
+        // --- Summary & Clipboard ---
+
+        function updateSummary() {
+            const container = document.getElementById('summaryPreview');
+            const date = new Date().toLocaleDateString();
+            let htmlContent = `<div class="mb-2 font-bold border-b border-gray-700 pb-2">📅 ${date} - ${translations[currentLang].summaryTitle}</div>`;
+            
+            // Take top 12 items for summary
+            newsItems.slice(0, 12).forEach((item, idx) => {
+                const title = item[`title_${currentLang}`] || item.title_en;
+                // HTML for preview
+                htmlContent += `
+                    <div class="mb-1.5 hover:bg-gray-700/50 p-1 rounded transition">
+                        <span class="text-gray-400 font-mono text-xs">[${item.time}]</span>
+                        <span class="text-secondary font-bold">【${item.platform}】</span>
+                        <span class="text-gray-300">${title}</span>
+                    </div>
+                `;
+            });
+            
+            htmlContent += `<div class="mt-4 text-xs text-gray-500">🔗 Source: Global Food Delivery Insights 2025</div>`;
+            container.innerHTML = htmlContent;
+        }
+
+        function copySummary() {
+            // Construct Plain Text for Clipboard
+            const date = new Date().toLocaleDateString();
+            let text = `📅 ${date} - ${translations[currentLang].summaryTitle}\n------------------------------\n`;
+            
+            newsItems.slice(0, 12).forEach((item, idx) => {
+                const title = item[`title_${currentLang}`] || item.title_en;
+                // Plain text format
+                text += `${item.time} | 【${item.platform}】 ${title}\n`;
+            });
+            text += `\n🔗 Source: Global Food Delivery Insights 2025`;
+
+            // 优先使用 document.execCommand ('copy')，因为它在 iframe/预览环境中更稳定
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            
+            // 确保文本域不可见但存在于 DOM 中
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            textArea.style.top = "0";
+            document.body.appendChild(textArea);
+            
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast(translations[currentLang].copySuccess, 'success');
+                } else {
+                    throw new Error('execCommand failed');
+                }
+            } catch (err) {
+                // 如果传统方法失败，尝试现代 API
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showToast(translations[currentLang].copySuccess, 'success');
+                    }).catch(() => {
+                        showToast(translations[currentLang].copyFail, 'error');
+                    });
+                } else {
+                    showToast(translations[currentLang].copyFail, 'error');
+                }
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            
+            toastMsg.innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // --- Resources Logic ---
+
+        function renderResources() {
+            const grid = document.getElementById('resourceGrid');
+            grid.innerHTML = '';
+            
+            resources.forEach(res => {
+                const desc = res[`desc_${currentLang}`] || res.desc_en;
+                const html = `
+                    <a href="${res.url}" target="_blank" class="flex items-start p-4 bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition group">
+                        <div class="w-10 h-10 bg-blue-50 text-primary rounded-lg flex items-center justify-center flex-shrink-0 mr-4 group-hover:bg-primary group-hover:text-white transition">
+                            <i class="fas ${res.icon}"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800 group-hover:text-primary transition">${res.name}</h4>
+                            <p class="text-xs text-gray-500 mt-1">${desc}</p>
+                        </div>
+                        <div class="ml-auto text-gray-300 group-hover:text-primary transition">
+                            <i class="fas fa-external-link-alt text-xs"></i>
+                        </div>
+                    </a>
+                `;
+                grid.innerHTML += html;
+            });
+        }
+
+        // --- Chart.js Logic ---
+
+        function initChart() {
+            const ctx = document.getElementById('marketChart').getContext('2d');
+            
+            const data = {
+                labels: ['iFood', 'Uber Eats (Legacy)', 'Rappi', '99Food', 'Others'],
+                datasets: [{
+                    data: [75, 3, 12, 6, 4], // Updated 2025 Mock Data
+                    backgroundColor: [
+                        '#EA1D2C', // iFood Red
+                        '#555555', // Uber Grey
+                        '#F36E65', // Rappi Orangeish
+                        '#F6C90E', // 99 Yellow
+                        '#E2E8F0'  // Others
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            };
+
+            const config = {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    family: "'Inter', sans-serif",
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            };
+
+            myChart = new Chart(ctx, config);
+        }
+
+        function updateChart() {
+            myChart.update(); 
+        }
+
+        // Initialize on Load
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
